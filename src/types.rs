@@ -62,7 +62,7 @@ pub(crate) struct Invader {
     pub(crate) col: usize,
 }
 
-pub(crate) struct SpaceInvadersGame {
+pub struct SpaceInvadersGame {
     pub(crate) physics: PhysicsSystem,
     /// Ticks `Lifetime` components down and despawns expired bullets.
     pub(crate) lifetimes: LifetimeSystem,
