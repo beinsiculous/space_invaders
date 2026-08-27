@@ -57,8 +57,20 @@ impl SpaceInvadersGame {
     /// End the match, win or lose. Entities stay on screen behind the
     /// game-over overlay; the next start rebuilds them.
     pub(crate) fn finish_game(&mut self, ctx: &mut GameContext, won: bool) {
+        // Both co-op cannons can fall to the same frame's volley: the first
+        // call ends the match, a second must not re-submit scores.
+        if let GameState::GameOver { .. } = self.state {
+            return;
+        }
         self.destroy_all_bullets(ctx.world);
         self.destroy_ufo(ctx.world);
+        let mode = match self.mode {
+            GameMode::SinglePlayer => "single",
+            GameMode::TwoPlayerCoop => "coop",
+        };
+        for player in &self.players {
+            ctx.scores.submit(mode, u64::from(player.score));
+        }
         self.state = GameState::GameOver { won };
     }
 
