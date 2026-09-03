@@ -69,7 +69,7 @@ impl SpaceInvadersGame {
             GameMode::TwoPlayerCoop => "coop",
         };
         for player in &self.players {
-            ctx.scores.submit(mode, u64::from(player.score));
+            let _ = ctx.scores.submit(mode, u64::from(player.score));
         }
         self.state = GameState::GameOver { won };
     }
