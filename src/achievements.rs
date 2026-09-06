@@ -1,6 +1,7 @@
 //! Space Invaders achievement definitions and unlock logic.
 //!
-//! Registered once in `init()`. Clear/perfect achievements unlock from the
+//! Registered through `Game::register_achievements` — the engine calls it before the window
+//! opens, which is what lets `--achievements-manifest` export the list with no GPU. Clear/perfect achievements unlock from the
 //! win path in `gameplay::flow`; the sharpshooter streak unlocks live in
 //! `gameplay::combat` the moment the streak hits `SHARPSHOOTER_TARGET`.
 
@@ -35,7 +36,7 @@ pub(crate) const DISPLAY_SECTIONS: &[(&str, &[&str])] = &[
         &[SHARPSHOOTER, LAST_STAND, UFO_HUNTER]),
 ];
 
-/// Register every Space Invaders achievement. Call once from `Game::init`.
+/// Register every Space Invaders achievement. Call once from `Game::register_achievements`.
 pub(crate) fn register_all(mgr: &mut AchievementManager) {
     mgr.register(Achievement::new(CLEAR_NORMAL,
         "Earth Defender",
