@@ -15,6 +15,8 @@ cargo run --features editor   # play inside the engine's scene editor
 cargo test                    # 36 headless tests
 ```
 
+The same build runs in the browser at [beinsiculous.com/playground/invaders/](https://beinsiculous.com/playground/invaders/): the game inside the editor, layout only — the rules are compiled in and nothing you change there persists.
+
 Requires the `insiculous_2d` engine checked out side by side
 (`../../insiculous_2d`) — the Cargo dependency is a relative path.
 
