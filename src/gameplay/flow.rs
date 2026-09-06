@@ -81,7 +81,7 @@ impl SpaceInvadersGame {
     }
 
     pub(crate) fn destroy_all_bullets(&mut self, world: &mut World) {
-        let mut bullets: Vec<EntityId> = self.invader_bullets.drain(..).collect();
+        let mut bullets: Vec<EntityId> = std::mem::take(&mut self.invader_bullets);
         for player in &mut self.players {
             bullets.append(&mut player.bullets);
         }
