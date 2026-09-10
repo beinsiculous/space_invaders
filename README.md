@@ -89,7 +89,7 @@ being assembled bottom-up, and clearing a layer stacks it onto the bun.
   **In-Bread Yokels** (canon rank-and-file — toast slices with fried-egg
   faces and a march-wiggle); the patty layer is the **little brown angry
   meatball guys** (the same cross-game characters as the rocks in
-  Meatieroids and a hazard in Hot Dog!); cheese = cheese-wedge guys;
+  Meatieroids and a hazard in Bratdog); cheese = cheese-wedge guys;
   lettuce = leafy guys; onward per ingredient.
 - **Bunkers become burger buns** with bites taken out as they degrade
   (kept from existing canon — the block-chomping already behaves like
