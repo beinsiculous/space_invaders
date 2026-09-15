@@ -355,11 +355,14 @@ fn player_bullet_registers_hit_on_barrier_block() {
     assert!(hit_block.is_some(), "player bullet never registered a contact with a barrier block");
 }
 
-/// The `Lifetime` safety net must despawn a stray bullet entirely.
+/// The `Lifetime` safety net must despawn a stray bullet entirely. The
+/// engine's frame tail steps the pass; the game owns no lifetime system, so
+/// the test drives one of its own over the frames it steps by hand.
 #[test]
 fn stray_bullet_expires_via_lifetime_system() {
     let mut game = SpaceInvadersGame::default();
     let mut world = World::new();
+    let mut lifetimes = LifetimeSystem::new();
 
     game.spawn_player_bullet(&mut world, 0, Vec2::ZERO, Vec4::ONE);
     let bullet = game.players[0].bullets[0];
@@ -368,7 +371,7 @@ fn stray_bullet_expires_via_lifetime_system() {
     let frames = (BULLET_LIFETIME * 60.0) as usize + 10;
     for _ in 0..frames {
         game.physics.update(&mut world, 1.0 / 60.0);
-        game.lifetimes.update(&mut world, 1.0 / 60.0);
+        lifetimes.update(&mut world, 1.0 / 60.0);
     }
     assert!(
         !world.entities().contains(&bullet),

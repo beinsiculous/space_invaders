@@ -67,9 +67,6 @@ impl SpaceInvadersGame {
 
         self.update_cannons(ctx);
         self.physics.update(ctx.world, ctx.delta_time);
-        // Expired bullets despawn here; the physics system garbage-collects
-        // their rapier bodies on its next update.
-        self.lifetimes.update(ctx.world, ctx.delta_time);
 
         // Drain this frame's collision events once (take = the buffer is
         // consumed, not borrowed). Every consumer below shares this Vec.

@@ -64,8 +64,6 @@ pub(crate) struct Invader {
 
 pub struct SpaceInvadersGame {
     pub(crate) physics: PhysicsSystem,
-    /// Ticks `Lifetime` components down and despawns expired bullets.
-    pub(crate) lifetimes: LifetimeSystem,
 
     pub(crate) invaders: Vec<Invader>,
     /// The mystery ship crossing the top lane, if one is in flight.
@@ -109,7 +107,6 @@ impl Default for SpaceInvadersGame {
     fn default() -> Self {
         Self {
             physics: PhysicsSystem::with_config(PhysicsConfig::top_down()),
-            lifetimes: LifetimeSystem::new(),
             invaders: Vec::new(),
             ufo: None,
             ufo_dir: 1.0,
