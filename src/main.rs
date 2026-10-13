@@ -16,5 +16,14 @@ fn main() {
     #[cfg(feature = "editor")]
     editor_integration::run_game_with_editor(SpaceInvadersGame::default(), config).unwrap();
     #[cfg(not(feature = "editor"))]
-    engine_core::prelude::run_game(SpaceInvadersGame::default(), config).unwrap();
+    {
+        // One design size: the HUD band's text and the life icons beside it are laid
+        // out for 800x600, and the world never scales with a native window, so another
+        // size would part the screen-space text from the world-space icons. Only the
+        // bare game is locked — the editor needs room for its panels, and the web page
+        // scales the whole canvas instead.
+        let mut config = config;
+        config.resizable = false;
+        engine_core::prelude::run_game(SpaceInvadersGame::default(), config).unwrap();
+    }
 }

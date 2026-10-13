@@ -1,84 +1,117 @@
-//! The defending cannons: movement, trigger discipline, and taking a hit.
-//! Everything here is parameterized by player index so single player (one
-//! merged cannon) and co-op (two independent cannons) share one code path.
+//! The defending cannons — Deion, and Cubert in co-op: movement and facing, the
+//! trigger, being jammed, and taking a hit. Everything is parameterized by player index,
+//! so single player (one cannon) and co-op (two) share one code path.
 
 use engine_core::prelude::*;
 
+use crate::art::*;
 use crate::constants::*;
+use crate::spawning::{face, spawn_effect, spawn_shot, Effect, ShotRecipe};
 use crate::types::*;
 
 use super::combat::player_fire_caps;
-use super::entity_position;
+use super::{clip_state, entity_position, ripple_grid};
 
-/// Where cannon `index` spawns for a roster of `player_count`: single player
-/// sits at center; co-op splits the two cannons to ∓`CANNON_COOP_OFFSET`.
-pub(crate) fn cannon_spawn_x(player_count: usize, index: usize) -> f32 {
-    if player_count <= 1 {
-        0.0
-    } else if index == 0 {
-        -CANNON_COOP_OFFSET
-    } else {
-        CANNON_COOP_OFFSET
-    }
+/// Whether a fresh volley of `shots` fits under `max_live` given the cannon's own shots
+/// already in flight. Each cannon checks its own, so one player firing at cap never
+/// blocks the other.
+pub(crate) fn volley_fits(live_shots: usize, shots: usize, max_live: usize) -> bool {
+    live_shots + shots <= max_live
 }
 
-/// Cannon (and bullet) tint for player `index`: player 1 wears the chaos
-/// theme's accent, everyone else the fixed player-2 color.
-pub(crate) fn player_color(index: usize, theme: &ChaosTheme) -> Vec4 {
-    if index == 0 {
-        theme.accent_color
-    } else {
-        PLAYER2_COLOR
-    }
-}
-
-/// Whether a fresh volley of `shots` fits under `max_live` given the cannon's
-/// own bullets already in flight. Each cannon checks this against its own
-/// bullets, so one player firing at cap never blocks the other.
-pub(crate) fn volley_fits(live_bullets: usize, shots: usize, max_live: usize) -> bool {
-    live_bullets + shots <= max_live
-}
-
-/// The co-op match is lost only when every cannon is out of lives. An empty
-/// roster (no match in progress) is not a defeat.
+/// The co-op match is lost only when every cannon is out of lives. An empty roster (no
+/// match in progress) is not a defeat.
 pub(crate) fn coop_defeated(lives: &[u32]) -> bool {
-    !lives.is_empty() && lives.iter().all(|&l| l == 0)
+    !lives.is_empty() && lives.iter().all(|&remaining| remaining == 0)
+}
+
+/// How a player's shot ended, for the sharpshooter streak.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ShotOutcome {
+    /// It busted something: the streak grows.
+    Kill,
+    /// It struck a Sour-Doom that took the hit: neither counted nor reset.
+    Absorbed,
+    /// A miss, a bunker or a cancel: the streak resets.
+    Miss,
 }
 
 impl SpaceInvadersGame {
-    /// Drive every live cannon from its player's input.
-    pub(crate) fn update_cannons(&mut self, ctx: &GameContext) {
+    /// Drive every cannon from its player's input.
+    pub(crate) fn update_cannons(&mut self, ctx: &mut GameContext) {
         for index in 0..self.players.len() {
             self.update_one_cannon(ctx, index);
         }
     }
 
-    /// Move cannon `index`. Keys/stick take over whenever pressed; the mouse
-    /// takes over on movement but only drives the lone single-player cannon.
-    fn update_one_cannon(&mut self, ctx: &GameContext, index: usize) {
+    /// Move cannon `index` and turn it the way it moved. Keys or stick take over whenever
+    /// pressed; the mouse takes over on movement but drives only the lone solo cannon.
+    /// A cannon waiting out a hit does nothing until its respawn, which is authoritative:
+    /// the body and the game's own x both go to its spawn.
+    fn update_one_cannon(&mut self, ctx: &mut GameContext, index: usize) {
         let Some(entity) = self.players[index].entity else { return };
-        let x = entity_position(ctx.world, entity).map(|p| p.x).unwrap_or(0.0);
+        let hero = self.players[index].hero;
+        self.players[index].jammed_for = (self.players[index].jammed_for - ctx.delta_time).max(0.0);
 
+        if let Some(seconds_left) = self.players[index].respawn_in {
+            let seconds_left = seconds_left - ctx.delta_time;
+            if seconds_left > 0.0 {
+                self.players[index].respawn_in = Some(seconds_left);
+            } else {
+                self.respawn_cannon(ctx.world, index);
+            }
+            return;
+        }
+
+        let x = self.players[index].x;
         let key_dx = self.cannon_axis(ctx, index) * PLAYER_SPEED;
         let mouse_active = index == 0
             && self.mode == GameMode::SinglePlayer
             && ctx.input.mouse_movement_delta().0.abs() > 0.0;
-
         let new_x = if key_dx != 0.0 {
             x + key_dx * ctx.delta_time
         } else if mouse_active {
-            // Window pixels (origin top-left) → world (origin center).
+            // Window pixels (origin top-left) → world (origin centre).
             ctx.input.mouse_position().x - ctx.window_size.x / 2.0
         } else {
             x
         };
+        let max_x = cannon_max_x(hero);
+        let new_x = new_x.clamp(-max_x, max_x);
 
-        let new_x = new_x.clamp(-PLAYER_MAX_X, PLAYER_MAX_X);
-        self.physics.set_kinematic_target(entity, Vec2::new(new_x, PLAYER_Y), 0.0);
+        let moved = new_x != x;
+        if moved {
+            let facing = if new_x < x { Facing::Left } else { Facing::Right };
+            self.players[index].facing = facing;
+            face(ctx.world, entity, hero.spec().sheet, facing);
+        }
+        self.players[index].x = new_x;
+        self.physics.set_kinematic_target(entity, Vec2::new(new_x, cannon_y(hero)), 0.0);
+
+        // A shot's `fire` plays out: movement never cuts it short.
+        if clip_state(ctx.world, entity).as_deref() != Some(FIRE) {
+            set_clip_state(ctx.world, entity, if moved { WALK } else { IDLE });
+        }
     }
 
-    /// Merged horizontal axis for cannon `index`. The single cannon answers
-    /// to both players' devices; each co-op cannon answers to its own.
+    /// Bring cannon `index` back from a surviving hit: at its spawn, facing right, at
+    /// rest. Authoritative — the body is reset and the game's own x set, so the next
+    /// frame's movement starts from the spawn, not from where the cannon fell.
+    pub(super) fn respawn_cannon(&mut self, world: &mut World, index: usize) {
+        let Some(entity) = self.players[index].entity else { return };
+        let hero = self.players[index].hero;
+        let spawn_x = cannon_spawn_x(self.players.len(), index);
+        let player = &mut self.players[index];
+        player.respawn_in = None;
+        player.x = spawn_x;
+        player.facing = Facing::Right;
+        self.physics.reset_body(entity, Vec2::new(spawn_x, cannon_y(hero)));
+        face(world, entity, hero.spec().sheet, Facing::Right);
+        set_clip_state(world, entity, IDLE);
+    }
+
+    /// Merged horizontal axis for cannon `index`. The solo cannon answers to both
+    /// players' devices; each co-op cannon to its own.
     fn cannon_axis(&self, ctx: &GameContext, index: usize) -> f32 {
         match self.mode {
             GameMode::SinglePlayer => (ctx.players.move_x(PlayerId::P1, ctx.input)
@@ -88,9 +121,8 @@ impl SpaceInvadersGame {
         }
     }
 
-    /// Is the fire button held for cannon `index`? The single cannon fires on
-    /// either player's Action1 (Space/mouse or Enter); each co-op cannon on
-    /// its own.
+    /// Is the fire button held for cannon `index`? The solo cannon fires on either
+    /// player's Action1; each co-op cannon on its own.
     fn fire_held(&self, ctx: &GameContext, index: usize) -> bool {
         match self.mode {
             GameMode::SinglePlayer => {
@@ -103,9 +135,16 @@ impl SpaceInvadersGame {
         }
     }
 
-    /// Hold-to-fire for every live cannon; each keeps its own cooldown and
-    /// bullet cap. The chaos mode sets the trigger discipline (see
-    /// [`player_fire_caps`]).
+    /// Where cannon `index`'s shot leaves from: the top of the mohawk or of the cube,
+    /// mirrored with the facing.
+    pub(crate) fn muzzle(&self, index: usize) -> Vec2 {
+        let player = &self.players[index];
+        let offset = player.hero.muzzle_offset();
+        Vec2::new(player.x + offset.x * player.facing.sign(), cannon_y(player.hero) + offset.y)
+    }
+
+    /// Hold-to-fire for every cannon; each keeps its own cooldown and shot cap. The chaos
+    /// mode sets the trigger discipline (see [`player_fire_caps`]).
     pub(crate) fn update_firing(&mut self, ctx: &mut GameContext) {
         for index in 0..self.players.len() {
             self.update_one_cannon_fire(ctx, index);
@@ -113,88 +152,107 @@ impl SpaceInvadersGame {
     }
 
     fn update_one_cannon_fire(&mut self, ctx: &mut GameContext, index: usize) {
-        self.players[index].fire_cooldown =
-            (self.players[index].fire_cooldown - ctx.delta_time).max(0.0);
+        self.players[index].fire_cooldown = (self.players[index].fire_cooldown - ctx.delta_time).max(0.0);
 
-        if !self.fire_held(ctx, index) || self.players[index].fire_cooldown > 0.0 {
+        let player = &self.players[index];
+        if !player.is_active() || player.jammed_for > 0.0 || player.fire_cooldown > 0.0 || !self.fire_held(ctx, index) {
             return;
         }
-
         let (shots, max_live) = player_fire_caps(self.chaos_mode);
-        if !volley_fits(self.players[index].bullets.len(), shots, max_live) {
+        if !volley_fits(player.shots.len(), shots, max_live) {
+            return;
+        }
+        let Some(entity) = player.entity else { return };
+
+        let muzzle = self.muzzle(index);
+        let offsets: &[f32] = if shots == 2 { &[-TWIN_VOLLEY_OFFSET, TWIN_VOLLEY_OFFSET] } else { &[0.0] };
+        for &offset in offsets {
+            self.spawn_player_shot(ctx.world, index, Vec2::new(muzzle.x + offset, muzzle.y));
+        }
+        self.players[index].fire_cooldown = FIRE_COOLDOWN;
+        set_clip_state(ctx.world, entity, FIRE);
+    }
+
+    /// Spawn one of cannon `index`'s shots with its tail at `muzzle`.
+    pub(crate) fn spawn_player_shot(&mut self, world: &mut World, index: usize, muzzle: Vec2) {
+        let hero = self.players[index].hero;
+        let spec = hero.spec();
+        let recipe = ShotRecipe {
+            name: if hero == Hero::Deion { "Icicle" } else { "Ice Chip" },
+            spec: spec.shot,
+            sheet: self.sheets.hero_shot(hero),
+            depth: spec.shot_depth,
+            half_collider: player_shot_half_collider(hero),
+        };
+        let position = muzzle + Vec2::new(0.0, half_size(spec.shot).y);
+        let shot = spawn_shot(world, &mut self.physics, &recipe, position, Vec2::new(0.0, PLAYER_SHOT_SPEED));
+        self.players[index].shots.push(shot);
+    }
+
+    /// Cannon `index` took a crumb: clear every shot, spend one of its lives, and play
+    /// its `hurt` as a detached one-shot at its spot and facing — it never collides and
+    /// nothing preempts it. A surviving cannon is hidden and inert for the hurt's length,
+    /// then reappears at its spawn; on the last life the hurt holds its final frame until
+    /// a restart or a quit, the cannon goes, and the match ends once every cannon is out.
+    pub(super) fn player_hit(&mut self, ctx: &mut GameContext, index: usize) {
+        if !self.players[index].is_active() {
             return;
         }
         let Some(entity) = self.players[index].entity else { return };
-        let Some(pos) = entity_position(ctx.world, entity) else { return };
-
+        let hero = self.players[index].hero;
+        let facing = self.players[index].facing;
+        let position = entity_position(ctx.world, entity).unwrap_or(Vec2::new(self.players[index].x, cannon_y(hero)));
         let theme = ChaosTheme::for_mode(self.chaos_mode);
-        let color = player_color(index, &theme);
-        let muzzle_y = pos.y + PLAYER_H / 2.0 + PLAYER_BULLET_H / 2.0 + 1.0;
-        if shots == 2 {
-            for dx in [-TWIN_CANNON_OFFSET, TWIN_CANNON_OFFSET] {
-                self.spawn_player_bullet(ctx.world, index, Vec2::new(pos.x + dx, muzzle_y), color);
-            }
-        } else {
-            self.spawn_player_bullet(ctx.world, index, Vec2::new(pos.x, muzzle_y), color);
-        }
-        self.players[index].fire_cooldown = FIRE_COOLDOWN;
-    }
+        ctx.particles.spawn_burst(position, &crate::effects::player_hit_burst(&theme, self.sheets.white));
+        ripple_grid(ctx.world, position, GRID_IMPULSE_PLAYER_HIT_STRENGTH, GRID_IMPULSE_PLAYER_HIT_RADIUS);
 
-    /// Cannon `index` took a hit: explode, clear the incoming volley, and
-    /// spend one of that player's lives. At zero lives the cannon is
-    /// despawned and the survivor plays on; the match ends only once every
-    /// cannon is gone.
-    pub(super) fn player_hit(&mut self, ctx: &mut GameContext, index: usize) {
-        let spawn_x = cannon_spawn_x(self.players.len(), index);
-        let pos = self.players[index]
-            .entity
-            .and_then(|e| entity_position(ctx.world, e))
-            .unwrap_or(Vec2::new(spawn_x, PLAYER_Y));
-        let theme = ChaosTheme::for_mode(self.chaos_mode);
-        ctx.particles
-            .spawn_burst(pos, &crate::effects::player_hit_burst(&theme, self.tex_id));
-        self.ripple_grid(pos, GRID_IMPULSE_PLAYER_HIT_STRENGTH, GRID_IMPULSE_PLAYER_HIT_RADIUS);
+        self.destroy_all_shots(ctx.world);
+        let player = &mut self.players[index];
+        player.shot_streak = 0;
+        player.jammed_for = 0.0;
+        player.lives = player.lives.saturating_sub(1);
+        let last_life = player.lives == 0;
 
-        self.destroy_all_bullets(ctx.world);
-        self.players[index].shot_streak = 0;
-        self.players[index].lives = self.players[index].lives.saturating_sub(1);
+        let spec = hero.spec();
+        let hurt = spawn_effect(ctx.world, &Effect {
+            name: "Hurt", spec: spec.sheet, sheet: self.sheets.hero(hero), depth: spec.depth,
+            clip: HURT, position, facing,
+        }, last_life);
+        self.transient_visuals.push(hurt);
 
-        if self.players[index].lives == 0 {
+        if last_life {
             if let Some(entity) = self.players[index].entity.take() {
                 self.physics.destroy_entity(ctx.world, entity);
             }
-            let lives: Vec<u32> = self.players.iter().map(|p| p.lives).collect();
+            let lives: Vec<u32> = self.players.iter().map(|player| player.lives).collect();
             if coop_defeated(&lives) {
                 self.finish_game(ctx, false);
             }
-            return;
-        }
-
-        // Survives: respawn at this cannon's home column; the fleet doesn't wait.
-        if let Some(entity) = self.players[index].entity {
-            self.physics
-                .set_kinematic_target(entity, Vec2::new(spawn_x, PLAYER_Y), 0.0);
+        } else {
+            self.players[index].respawn_in = Some(RESPAWN_SECONDS);
         }
     }
 
-    /// Retire one of cannon `index`'s bullets and account for the shot: kills
-    /// extend that player's sharpshooter streak, anything else resets it.
-    pub(super) fn finish_player_shot(
-        &mut self,
-        ctx: &mut GameContext,
-        index: usize,
-        bullet: EntityId,
-        killed: bool,
-    ) {
-        self.players[index].bullets.retain(|&b| b != bullet);
-        self.physics.destroy_entity(ctx.world, bullet);
-        if killed {
-            self.players[index].shot_streak += 1;
-            if self.players[index].shot_streak == SHARPSHOOTER_TARGET {
-                ctx.achievements.unlock(crate::achievements::SHARPSHOOTER);
+    /// Cannon `index` took a jam glob: no shot until the jam runs out, a second glob
+    /// refreshing it. No life is lost.
+    pub(super) fn jam_cannon(&mut self, index: usize) {
+        self.players[index].jammed_for = JAM_SECONDS;
+        self.show_notice(Notice::Jammed { player: index });
+    }
+
+    /// Retire one of cannon `index`'s shots and account for it.
+    pub(super) fn finish_player_shot(&mut self, ctx: &mut GameContext, index: usize, shot: EntityId, outcome: ShotOutcome) {
+        self.players[index].shots.retain(|&live| live != shot);
+        self.physics.destroy_entity(ctx.world, shot);
+        match outcome {
+            ShotOutcome::Kill => {
+                self.players[index].shot_streak += 1;
+                if self.players[index].shot_streak == SHARPSHOOTER_TARGET {
+                    ctx.achievements.unlock(crate::achievements::SHARPSHOOTER);
+                }
             }
-        } else {
-            self.players[index].shot_streak = 0;
+            ShotOutcome::Absorbed => {}
+            ShotOutcome::Miss => self.players[index].shot_streak = 0,
         }
     }
 }

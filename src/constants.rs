@@ -1,132 +1,194 @@
+//! Toast Busters' layout and tuning. The sheets, the roster and the draw depths are
+//! `art.rs`'s; everything here is derived from them or is a rule's own number.
+//!
+//! The game is drawn at one art pixel per window pixel, pixel-snapped, in a fixed
+//! 800 x 600 window. A position here is a cell centre on a whole pixel; the body
+//! that stands there is placed by its sheet's measured offset
+//! (`SheetSpec::position_for_cell`), so a collider centre may sit on a half pixel while
+//! the art stays crisp.
+
 use engine_core::prelude::*;
+
+use crate::art::{half_size, Hero, DEION, BUNKER_CELL};
 
 pub(crate) const WIN_W: f32 = 800.0;
 pub(crate) const WIN_H: f32 = 600.0;
 
-// --- Player cannon ---
-pub(crate) const PLAYER_W: f32 = 52.0;
-pub(crate) const PLAYER_H: f32 = 18.0;
-pub(crate) const PLAYER_SCALE: Vec2 = Vec2::new(PLAYER_W / RENDER_UNIT, PLAYER_H / RENDER_UNIT);
-pub(crate) const PLAYER_Y: f32 = -250.0;
-pub(crate) const PLAYER_SPEED: f32 = 420.0;
-pub(crate) const PLAYER_MAX_X: f32 = WIN_W / 2.0 - 20.0 - PLAYER_W / 2.0;
-/// Co-op: each cannon starts this far to either side of center (∓). Must
-/// sit inside `PLAYER_MAX_X` so both spawn in-bounds.
-pub(crate) const CANNON_COOP_OFFSET: f32 = 120.0;
-/// Tint for player 2's cannon and its bullets (player 1 uses the chaos
-/// theme's accent color, so the two cannons always read apart).
-pub(crate) const PLAYER2_COLOR: Vec4 = Vec4::new(1.0, 0.75, 0.2, 1.0);
+// --- the HUD band, the window's top 45 px, in screen pixels from its top ----------------
+// Two text rows above the flyby lane. Row one holds each score with its life icons and
+// the chaos banner between them; row two each streak under its score and one centred
+// transient. No two labels that can show at once share a place.
 
-// --- Bullets ---
-pub(crate) const PLAYER_BULLET_W: f32 = 5.0;
-pub(crate) const PLAYER_BULLET_H: f32 = 14.0;
-pub(crate) const PLAYER_BULLET_SPEED: f32 = 540.0;
-pub(crate) const INVADER_BULLET_W: f32 = 6.0;
-pub(crate) const INVADER_BULLET_H: f32 = 12.0;
-pub(crate) const INVADER_BULLET_SPEED: f32 = 240.0;
-/// Safety-net auto-despawn for any bullet that somehow escapes the
-/// off-screen culling (engine `Lifetime` component).
-pub(crate) const BULLET_LIFETIME: f32 = 2.5;
-/// Seconds between player shots.
-pub(crate) const FIRE_COOLDOWN: f32 = 0.4;
-/// Live player bullets allowed at once (classic single-shot discipline).
-pub(crate) const MAX_PLAYER_BULLETS: usize = 1;
-/// Insane mode: live-bullet cap — extra single shots on screen compensate
-/// for the faster-marching fleet.
-pub(crate) const INSANE_MAX_PLAYER_BULLETS: usize = 4;
-/// Ridiculous mode: live-bullet cap for the twin cannon (one volley of 2
-/// in flight — the classic discipline with two barrels).
-pub(crate) const RIDICULOUS_MAX_PLAYER_BULLETS: usize = 2;
-/// Insiculous mode: live-bullet cap for the twin cannon (3 stacked volleys
-/// against both fleet buffs at once).
-pub(crate) const INSICULOUS_MAX_PLAYER_BULLETS: usize = 6;
-/// Ridiculous mode: horizontal offset of each twin-cannon barrel.
-pub(crate) const TWIN_CANNON_OFFSET: f32 = 12.0;
-pub(crate) const INVADER_BULLET_COLOR: Vec4 = Vec4::new(1.0, 0.4, 0.3, 1.0);
+pub(crate) const HUD_ROW_ONE: (f32, f32) = (4.0, 20.0);
+pub(crate) const HUD_ROW_TWO: (f32, f32) = (24.0, 40.0);
+pub(crate) const HUD_TEXT_MARGIN: f32 = 12.0;
+pub(crate) const HUD_SCORE_WIDTH: f32 = 120.0;
+pub(crate) const HUD_BANNER_WIDTH: f32 = 220.0;
+pub(crate) const HUD_TRANSIENT_WIDTH: f32 = 240.0;
+pub(crate) const HUD_FONT_SIZE: f32 = 14.0;
+/// The gap between a score's box and its first life icon, and between icons.
+pub(crate) const LIFE_ICON_GAP: f32 = 4.0;
 
-// --- Invader formation ---
-pub(crate) const INVADER_COLS: usize = 10;
-pub(crate) const INVADER_ROWS: usize = 5;
-pub(crate) const INVADER_W: f32 = 36.0;
-pub(crate) const INVADER_H: f32 = 24.0;
-pub(crate) const INVADER_SCALE: Vec2 = Vec2::new(INVADER_W / RENDER_UNIT, INVADER_H / RENDER_UNIT);
-pub(crate) const INVADER_GAP_X: f32 = 16.0;
-pub(crate) const INVADER_GAP_Y: f32 = 18.0;
-/// Y position of the center of the top invader row at spawn.
-pub(crate) const FORMATION_TOP_Y: f32 = 230.0;
-/// The formation's leftmost/rightmost invader center never marches past ±this.
-pub(crate) const MARCH_BOUND_X: f32 = WIN_W / 2.0 - 30.0;
-/// Horizontal march speed with the formation intact.
+// --- the flyby lane ------------------------------------------------------------------
+
+/// The flyers' cell centre: the saucer's 65 px body spans 189–254, under the HUD band.
+pub(crate) const FLYBY_CELL_Y: f32 = 221.0;
+pub(crate) const FLYER_SPEED: f32 = 130.0;
+/// Average flyer appearances per second (one every 15 s).
+pub(crate) const FLYER_SPAWN_RATE: f32 = 1.0 / 15.0;
+/// Of every four flybys, this many are Jammer's; the rest are Maxwell's saucer.
+pub(crate) const JAMMER_SHARE_OF_FOUR: u32 = 1;
+/// Maxwell's mystery bonus — a hash draw picks one per saucer (the classic table).
+pub(crate) const SAUCER_BONUS_VALUES: [u32; 4] = [50, 100, 150, 300];
+pub(crate) const JAMMER_POINTS: u32 = 100;
+/// Jammer drops a jam glob this often while over the field.
+pub(crate) const JAM_GLOB_INTERVAL: f32 = 1.2;
+pub(crate) const JAM_GLOB_SPEED: f32 = 180.0;
+/// A glob on a live cannon jams it: no shot for this long, a second glob refreshing it.
+pub(crate) const JAM_SECONDS: f32 = 1.5;
+/// Seconds a flyby flash or a jam notice stays in the HUD's transient slot.
+pub(crate) const NOTICE_SECONDS: f32 = 1.5;
+
+// --- the formation ----------------------------------------------------------------------
+
+pub(crate) const FORMATION_COLUMNS: usize = 10;
+/// The rows' cell centres, top down — pitch 54, the tallest Toasted being 49.
+pub(crate) const ROW_CELL_Y: [f32; 4] = [150.0, 96.0, 42.0, -12.0];
+pub(crate) const COLUMN_PITCH: f32 = 52.0;
+/// The outermost columns' cell centres: ±234.
+pub(crate) const OUTERMOST_COLUMN_X: f32 = (FORMATION_COLUMNS as f32 - 1.0) * COLUMN_PITCH / 2.0;
+/// The outermost live column's centre never marches past ±this: 136 px of travel.
+pub(crate) const MARCH_BOUND_X: f32 = 370.0;
 pub(crate) const MARCH_SPEED_BASE: f32 = 30.0;
-/// Horizontal march speed as the last invader standing.
 pub(crate) const MARCH_SPEED_MAX: f32 = 240.0;
-/// Insane mode: march speed multiplier.
 pub(crate) const INSANE_MARCH_MULT: f32 = 1.8;
-/// Vertical drop on every edge bounce.
-pub(crate) const DESCEND_STEP: f32 = 24.0;
-/// An invader center at or below this line means the fleet has landed.
-pub(crate) const INVASION_Y: f32 = -215.0;
+/// The drop on every edge bounce: the bunkers' top after 8 descents, the landing after 13.
+pub(crate) const DESCEND_STEP: f32 = 16.0;
 
-/// Average invader shots per second across the whole fleet.
+/// Average Toasted shots per second across the whole fleet.
 pub(crate) const INVADER_FIRE_RATE: f32 = 0.7;
 /// Ridiculous mode: fire-rate multiplier (Insane's buff is march speed).
 pub(crate) const RIDICULOUS_FIRE_MULT: f32 = 2.4;
 
-/// Points per kill, by row (0 = top row, scores the most — classic table).
-pub(crate) const INVADER_ROW_VALUES: [u32; INVADER_ROWS] = [30, 20, 20, 10, 10];
-/// Row tints, top to bottom.
-pub(crate) const INVADER_ROW_COLORS: [Vec4; INVADER_ROWS] = [
-    Vec4::new(1.0, 0.35, 0.75, 1.0), // magenta
-    Vec4::new(1.0, 0.55, 0.25, 1.0), // orange
-    Vec4::new(1.0, 0.9, 0.3, 1.0),   // yellow
-    Vec4::new(0.35, 0.95, 0.5, 1.0), // green
-    Vec4::new(0.35, 0.7, 1.0, 1.0),  // blue
+// --- the bunkers --------------------------------------------------------------------------
+
+pub(crate) const BUNKER_COUNT: usize = 4;
+/// The bunkers' cell centres: x by bunker, and one y — the cells span −199…−151.
+pub(crate) const BUNKER_XS: [f32; BUNKER_COUNT] = [-270.0, -90.0, 90.0, 270.0];
+pub(crate) const BUNKER_CELL_Y: f32 = -175.0;
+pub(crate) const BUNKER_BLOCK_PX: f32 = 16.0;
+pub(crate) const BUNKER_BLOCK_COLUMNS: usize = 4;
+pub(crate) const BUNKER_BLOCK_ROWS: usize = 3;
+/// A block stands only where its slice of the current state draws at least this many
+/// opaque pixels: a block with less would be an invisible wall.
+pub(crate) const BLOCK_MIN_OPAQUE_PIXELS: u32 = 16;
+/// Opaque pixels in each 16 px slice of the bunker art, by state, row and column —
+/// measured on the synced sheet, which a test re-measures.
+pub(crate) const BUNKER_SLICE_OPAQUE: [[[u32; BUNKER_BLOCK_COLUMNS]; BUNKER_BLOCK_ROWS]; 4] = [
+    [[7, 64, 60, 2], [110, 256, 256, 63], [80, 161, 160, 65]],
+    [[0, 0, 0, 0], [89, 256, 158, 8], [80, 161, 160, 65]],
+    [[0, 0, 0, 0], [0, 134, 92, 1], [72, 161, 142, 53]],
+    [[0, 0, 0, 0], [0, 0, 0, 0], [66, 146, 144, 57]],
 ];
+/// The damage at which a bunker becomes `damaged`, `critical` and `melted`. Ten blocks
+/// stand at the start, so every state is reachable.
+pub(crate) const BUNKER_STATE_DAMAGE: [u32; 3] = [2, 4, 6];
+/// The top of the bunkers' cells.
+pub(crate) const BUNKER_TOP_Y: f32 = BUNKER_CELL_Y + BUNKER_CELL.y / 2.0;
 
-// --- UFO (mystery ship) ---
-pub(crate) const UFO_W: f32 = 44.0;
-pub(crate) const UFO_H: f32 = 16.0;
-pub(crate) const UFO_SCALE: Vec2 = Vec2::new(UFO_W / RENDER_UNIT, UFO_H / RENDER_UNIT);
-/// Flight lane across the top, above the fresh formation.
-pub(crate) const UFO_Y: f32 = 268.0;
-pub(crate) const UFO_SPEED: f32 = 130.0;
-/// Average UFO appearances per second (~one every 15s).
-pub(crate) const UFO_SPAWN_RATE: f32 = 1.0 / 15.0;
-/// Mystery bonus table — a hash draw picks one per UFO (classic values).
-pub(crate) const UFO_BONUS_VALUES: [u32; 4] = [50, 100, 150, 300];
-pub(crate) const UFO_COLOR: Vec4 = Vec4::new(1.0, 0.3, 0.45, 1.0);
-pub(crate) const UFO_EMISSIVE: f32 = 1.8;
-/// Seconds the "UFO +N" HUD flash stays up after a kill.
-pub(crate) const UFO_FLASH_SECS: f32 = 1.5;
+// --- the cannons ----------------------------------------------------------------------------
 
-// --- Barriers (bunkers) ---
-pub(crate) const BARRIER_COUNT: usize = 4;
-/// Each barrier is a grid of small destructible blocks.
-pub(crate) const BARRIER_BLOCK: f32 = 12.0;
-pub(crate) const BARRIER_BLOCK_COLS: usize = 6;
-pub(crate) const BARRIER_BLOCK_ROWS: usize = 3;
-/// Y position of a barrier's center row.
-pub(crate) const BARRIER_Y: f32 = -180.0;
-/// X positions of the barrier centers.
-pub(crate) const BARRIER_XS: [f32; BARRIER_COUNT] = [-270.0, -90.0, 90.0, 270.0];
+/// The line every cannon's collision envelope stands on.
+pub(crate) const GROUND_Y: f32 = -290.0;
+pub(crate) const PLAYER_SPEED: f32 = 420.0;
+/// The envelope never comes nearer the window's side than this.
+pub(crate) const CANNON_SIDE_MARGIN: f32 = 20.0;
+/// Co-op: each cannon starts this far to either side of centre (∓).
+pub(crate) const CANNON_COOP_OFFSET: f32 = 120.0;
+/// The Ridiculous and Insiculous twin volley: the muzzle ± this, inside the body.
+pub(crate) const TWIN_VOLLEY_OFFSET: f32 = 10.0;
+/// A surviving hit hides the cannon for its `hurt` (4 frames at 100 ms), then it
+/// reappears at its spawn.
+pub(crate) const RESPAWN_SECONDS: f32 = 0.4;
+/// The fleet has landed when a live Toasted's bottom edge reaches this: the top of
+/// Deion's envelope, the taller cannon. It lies above every cannon, so it is the only
+/// landing rule.
+pub(crate) const INVASION_Y: f32 = GROUND_Y + (DEION.bounds.1.y - DEION.bounds.0.y);
 
 pub(crate) const STARTING_LIVES: u32 = 3;
 /// Consecutive kill shots (no misses in between) for the streak achievement.
 pub(crate) const SHARPSHOOTER_TARGET: u32 = 10;
 
-/// Extra margin past the window edge before a bullet is culled.
-pub(crate) const BULLET_CULL_PAD: f32 = 30.0;
+// --- shots ------------------------------------------------------------------------------------
 
-pub(crate) const PLAYER_EMISSIVE: f32 = 1.5;
-pub(crate) const BULLET_EMISSIVE: f32 = 2.5;
-pub(crate) const INVADER_EMISSIVE: f32 = 0.9;
-pub(crate) const BARRIER_EMISSIVE: f32 = 0.6;
+pub(crate) const PLAYER_SHOT_SPEED: f32 = 540.0;
+/// A player's shot collides as its centre line, 2 px wide over the drawn height —
+/// classic Invaders' thin shot, narrower than the icicle or chip it draws.
+pub(crate) const PLAYER_SHOT_COLLIDER_WIDTH: f32 = 2.0;
+pub(crate) const CRUMB_SPEED: f32 = 240.0;
+/// Safety-net auto-despawn for any shot that somehow escapes the culling. Long enough for
+/// the slowest shot — a jam glob from the lane — to fall past the cull line first, or a
+/// glob that missed would blink out above the window's edge.
+pub(crate) const SHOT_LIFETIME: f32 = 3.5;
+/// Seconds between a cannon's shots.
+pub(crate) const FIRE_COOLDOWN: f32 = 0.4;
+pub(crate) const MAX_PLAYER_SHOTS: usize = 1;
+/// Insane: extra single shots on screen against the faster fleet.
+pub(crate) const INSANE_MAX_PLAYER_SHOTS: usize = 4;
+/// Ridiculous: one twin volley in flight.
+pub(crate) const RIDICULOUS_MAX_PLAYER_SHOTS: usize = 2;
+/// Insiculous: three stacked twin volleys against both fleet buffs.
+pub(crate) const INSICULOUS_MAX_PLAYER_SHOTS: usize = 6;
+/// Extra margin past the window edge before a shot is culled.
+pub(crate) const SHOT_CULL_PAD: f32 = 30.0;
 
-// Radial impulses kicked into the spring-mass background grid.
+// --- the backdrop grid --------------------------------------------------------------------
+
+/// The backdrop grid's alpha, well under the preset's resting value: the lattice reads
+/// over the countertop without veiling it.
+pub(crate) const BACKDROP_ALPHA: f32 = 0.25;
 pub(crate) const GRID_IMPULSE_KILL_STRENGTH: f32 = 260.0;
 pub(crate) const GRID_IMPULSE_KILL_RADIUS: f32 = 90.0;
 pub(crate) const GRID_IMPULSE_PLAYER_HIT_STRENGTH: f32 = 700.0;
 pub(crate) const GRID_IMPULSE_PLAYER_HIT_RADIUS: f32 = 160.0;
+
+/// Collider outlines for the F1 overlay.
+pub(crate) const DEBUG_COLLIDER_COLOR: Vec4 = Vec4::new(1.0, 0.2, 1.0, 0.9);
+pub(crate) const DEBUG_COLLIDER_EMISSIVE: f32 = 2.0;
+
+// --- derived positions ------------------------------------------------------------------------
+
+/// The cell centre of formation column `column`, before any march.
+pub(crate) fn column_cell_x(column: usize) -> f32 {
+    -OUTERMOST_COLUMN_X + column as f32 * COLUMN_PITCH
+}
+
+/// Where `hero`'s cannon stands: its envelope's centre, the envelope on the ground.
+pub(crate) fn cannon_y(hero: Hero) -> f32 {
+    GROUND_Y + hero.half_envelope().y
+}
+
+/// The farthest `hero`'s cannon may stand from centre.
+pub(crate) fn cannon_max_x(hero: Hero) -> f32 {
+    WIN_W / 2.0 - CANNON_SIDE_MARGIN - hero.half_envelope().x
+}
+
+/// Where cannon `index` starts for a roster of `player_count`: solo at centre, co-op
+/// split to ∓`CANNON_COOP_OFFSET`.
+pub(crate) fn cannon_spawn_x(player_count: usize, index: usize) -> f32 {
+    if player_count <= 1 {
+        0.0
+    } else if index == 0 {
+        -CANNON_COOP_OFFSET
+    } else {
+        CANNON_COOP_OFFSET
+    }
+}
+
+/// The half size a player's shot collides with: its centre line over the drawn height.
+pub(crate) fn player_shot_half_collider(hero: Hero) -> Vec2 {
+    Vec2::new(PLAYER_SHOT_COLLIDER_WIDTH / 2.0, half_size(hero.spec().shot).y)
+}
 
 // --- the startup cards and the window icon ---------------------------------------
 // Synced from deion_assets like every sheet (`assets/sprites/sync.list`).

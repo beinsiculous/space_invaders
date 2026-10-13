@@ -1,18 +1,17 @@
-# Insiculous Space Invaders
+# Toast Busters
 
-A neon Geometry-Wars-styled take on Space Invaders, built on the sibling
-[`insiculous_2d`](../../insiculous_2d) engine (game 3 of the 20 Games
-Challenge). Everything on screen is a glowing rectangle: a 5×10 alien fleet
-marches over four destructible bunkers while one or two cannons hold the
-line, with bloom, particle bursts, and a spring-mass background grid that
-ripples on every kill.
+Space Invaders, re-skinned into the Deion world and built on the sibling
+[`insiculous_2d`](../../insiculous_2d) engine. Deion — and Cubert in co-op — hold
+the counter against four rows of the **Toasted**: haunted slices of bread marching
+over four butter bunkers, while Maxwell's cake saucer and Jammer cross the lane
+above them. Everything is pixel art drawn at one art pixel per window pixel.
 
 ## Running
 
 ```bash
 cargo run                     # play
 cargo run --features editor   # play inside the engine's scene editor
-cargo test                    # 36 headless tests
+cargo test                    # 68 headless tests
 ```
 
 The same build runs in the browser at [beinsiculous.com/playground/invaders/](https://beinsiculous.com/playground/invaders/): the game inside the editor, layout only — the rules are compiled in and nothing you change there persists.
@@ -31,82 +30,46 @@ Requires the `insiculous_2d` engine checked out side by side
 | Menus: navigate / confirm / back | W/S, Space, Esc | ↑/↓, Enter, Esc | D-pad, A, Start |
 | Collider debug overlay | F1 | F1 | — |
 
-In **single player** the lone cannon answers to BOTH input slots — WASD,
-arrows, and either gamepad all drive it, and the mouse takes over on
-movement. In **2P co-op** each cannon binds to its own player slot.
-Bindings persist to `saves/input_settings.json` (hand-editable JSON).
+In **single player** Deion answers to BOTH input slots — WASD, arrows, and either
+gamepad all drive him, and the mouse takes over on movement. In **2P co-op** Deion
+is player 1 and Cubert player 2, each on their own slot. Bindings persist to
+`saves/input_settings.json` (hand-editable JSON).
 
 ## Mechanics
 
-- **One formation per match.** The 5×10 fleet marches as a single body:
-  right until the outermost *live* invader touches the bound, then it drops
-  a step and reverses. Dead columns widen the march span, and the march
-  speed ramps from a crawl (full fleet) to a sprint (last invader
-  standing). Kill the last invader to win — there is no second wave today.
-- **You lose** when any invader reaches the invasion line or touches a live
-  cannon, or when every cannon runs out of lives (3 each). In co-op, a
-  cannon at zero lives despawns and the survivor plays on.
-- **Trigger discipline:** classic one-bullet-in-flight rule in Normal mode
-  (chaos modes relax it — see below). Bullets that cross an enemy bullet
-  cancel in a flash; a cancel or a miss resets your kill streak.
-- **Bunkers** are grids of small blocks chipped away by bullets from both
-  sides — and chomped directly by low-marching invaders.
-- **UFO:** a mystery ship occasionally crosses the top lane; shooting it
-  pays a classic 50/100/150/300 bonus.
-- **Scoring:** 30/20/20/10/10 points by row, top row pays most. Co-op keeps
-  separate scores and lives per cannon (shared fleet, shared fate).
-- **Chaos modes:** Insane = the fleet marches 1.8× faster, you get 4 shots
-  in the air. Ridiculous = the fleet fires 2.4× as often, you answer with
-  twin cannons. Insiculous = both at once, with stacked twin-cannon
-  volleys.
-- **Achievements** (11): clear and perfect-clear per chaos mode, a
-  10-kill-shot Sharpshooter streak, Last Stand, and UFO Hunter — persisted
-  to `saves/space_invaders_achievements.json`.
+- **One formation per match**, four rows of ten: **Sour-Doom** (30 points, takes
+  two hits), **Bagelgeist** (20), **Rye.I.P.** (20) and **Plain Wraith** (10), top
+  row down. The formation marches as one body: right until the outermost *live*
+  column touches the bound, then it drops a step and reverses. Dead columns widen
+  the march, and the pace ramps from a crawl to a sprint as the fleet thins. Bust
+  the last Toasted to win.
+- **Bagelgeist has a hole.** A shot that first touches a bagel inside its ring's
+  hole passes through it — and goes on to whatever is above.
+- **You lose** when a Toasted's body reaches the top of Deion's head height, or
+  when every cannon runs out of lives (3 each). A lost life plays Deion's or
+  Cubert's hurt; the cannon reappears at its start a moment later. In co-op a
+  cannon out of lives leaves the field and its partner plays on.
+- **Trigger discipline:** one shot in flight in Normal mode. Deion fires icicles,
+  Cubert ice chips; the Toasted drop burnt crumbs. Shots that cross cancel in a
+  flash, and a cancel or a miss resets your streak.
+- **Butter bunkers** chip away block by block — from your shots, the crumbs, and
+  the Toasted chomping through them — and every block draws its bunker's damage
+  state: intact, damaged, critical, melted.
+- **The flyby lane:** Maxwell's cake saucer pays a mystery 50/100/150/300 bonus.
+  Once in four flybys it is **Jammer** instead, who drops jam globs: a glob on a
+  cannon jams it for a moment — no shot, no life lost. Busting Jammer pays 100.
+- **Chaos modes:** Insane = the Toasted march 1.8× faster, you get 4 shots in the
+  air. Ridiculous = they fire 2.4× as often, you answer with twin volleys.
+  Insiculous = both at once, with stacked twin volleys.
+- **Achievements** (11): clear and perfect-clear per chaos mode, a 10-bust
+  Sharpshooter streak, Last Slice, and Saucer Hunter — persisted to
+  `saves/space_invaders_achievements.json`.
 
-## The Deion Pivot: Burger Invaders
+## Still to come
 
-The planned Phase G re-skin (the game is still neon today): the invasion
-becomes **Burger Invaders**, where every level is one layer of a burger
-being assembled bottom-up, and clearing a layer stacks it onto the bun.
+Toast Busters' levels — one bread per level, the level cards, Poptergeist and Pain
+Perdu, the toast shading by chaos tier, and Stay Pufft's finale — are their own batch
+(`space_invaders#3`). The site still lists the game as *Insiculous Invaders*.
 
-- **The defenders:** side-scroller **Deion** firing icicles UP from his
-  mohawk (his universal projectile language); P2 is **Cubert** firing ice
-  chips — smaller, scrappier.
-- **The burger builds as you win:**
-
-```
-        ... ???  (top bun? Maxwell?)         L?
-        ~ ~ ~  onions                        L6?
-        o o o  pickles                       L5?
-        ●●●●●  tomato                        L4?
-        ~~~~~  lettuce   → leafy guys        L3
-        ▲▲▲▲▲  cheese    → cheese-wedge guys L2
-        █████  patty     → angry meatballs   L1
-       (~~~~~) bottom bun → In-Bread Yokels
-```
-
-- **Enemy ranks reflect the layer being fought:** bun/bread layers are the
-  **In-Bread Yokels** (canon rank-and-file — toast slices with fried-egg
-  faces and a march-wiggle); the patty layer is the **little brown angry
-  meatball guys** (the same cross-game characters as the rocks in
-  Meatieroids and a hazard in Bratdog); cheese = cheese-wedge guys;
-  lettuce = leafy guys; onward per ingredient.
-- **Bunkers become burger buns** with bites taken out as they degrade
-  (kept from existing canon — the block-chomping already behaves like
-  bites). The **UFO flyby becomes Dr. Maxwell on his cake saucer** (kept).
-- Style source of truth: `deion_assets/DEION_STYLE.md` (root symlink to the
-  shared art repo). 16px cells, nearest filtering, 5× integer scale.
-
-### Open questions
-
-- Full ingredient/level order and total level count (tomato, pickles,
-  onions… in what order, ending where?).
-- Per-layer enemy designs beyond Yokels / meatballs / cheese wedges — the
-  new minor characters need Jesse's design pass.
-- Does per-level enemy variety need a roster system, versus today's single
-  hardcoded formation (row colors/values only)? Today the game has NO level
-  progression at all — the burger stack implies building one.
-- Boss burger finale? Is Dr. Maxwell waiting at the top of the stack?
-
-Answered questions move up into the theme spec above and get DELETED from
-this list (live-docs convention).
+The art is quarantined AI-assisted pixel art (`ai_` prefix, synced from
+`deion_assets`): it ships in free builds only until a person's cleanup pass.

@@ -6,12 +6,33 @@
 # and `--check` to prove the copies still match the pinned commit below (the
 # working set's scripts/check-sprite-sync.sh runs that over every game).
 #
-# Today it carries only the startup cards and the engine's window icon, which
-# every game shows; the game's own art arrives with its re-skin. The quarantined
+# It carries the startup cards and the engine's window icon, which every game
+# shows, and Toast Busters' nineteen sheets: the four Toasted, the two flyers,
+# the bunker, the four projectiles, the four bursts and splashes, the countertop,
+# Deion and Cubert, and the life icons. The quarantined
 # `ai_` prefix stays on the copies: a paid build's check_no_ai_assets.sh gate must
 # still find them until Jesse's cleanup pass.
 #
-# deion_assets bd4ff3f0b742b155e154a4f71f4837bd51164909
+# deion_assets 5abb22f8a91bad4ef77085bd604e16e3dd835580
 ai/branding/be_insiculous/ai_be_insiculous_320x192.png
 ai/branding/insiculous_2d_maxwell/ai_insiculous_2d_maxwell_splash_320x192.png
 ai/branding/insiculous_2d_maxwell/ai_insiculous_2d_maxwell_icon_64x64.png
+ai/sidescroller/sour_doom/ai_sour_doom.png
+ai/sidescroller/bagelgeist/ai_bagelgeist.png
+ai/sidescroller/rye_i_p/ai_rye_i_p.png
+ai/sidescroller/plain_wraith/ai_plain_wraith.png
+ai/sidescroller/jammer/ai_jammer.png
+ai/sidescroller/ships/maxwell_cake_saucer/ai_maxwell_cake_saucer_96x80.png
+ai/sidescroller/props/butter_bunker/ai_butter_bunker_64x48.png
+ai/sidescroller/props/icicle/ai_icicle_16x16.png
+ai/sidescroller/props/ice_chip/ai_ice_chip_16x16.png
+ai/sidescroller/props/burnt_crumb/ai_burnt_crumb_16x16.png
+ai/sidescroller/props/jam_glob/ai_jam_glob_16x16.png
+ai/sidescroller/props/crouton_burst/ai_crouton_burst_64x64.png
+ai/sidescroller/props/jam_splatter/ai_jam_splatter_32x32.png
+ai/sidescroller/props/butter_splash/ai_butter_splash_32x32.png
+ai/sidescroller/props/ice_burst/ai_ice_burst_32x32.png
+ai/sidescroller/tiles/toast_busters_countertop/ai_countertop_64x64.png
+ai/sidescroller/deion/ai_deion.png
+ai/sidescroller/cubert/ai_cubert.png
+ai/sidescroller/props/busters_life_icon/ai_busters_life_icon_16x16.png

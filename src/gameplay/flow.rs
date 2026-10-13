@@ -1,18 +1,18 @@
-//! Match lifecycle: state-machine input during play, starting/ending a
-//! match, and pushing the chaos theme onto live entities.
+//! Match lifecycle: state input during play, starting and ending a match, and what a
+//! restart or a quit clears.
 
 use engine_core::prelude::*;
 
-use crate::spawning;
+use crate::art::Hero;
+use crate::constants::*;
+use crate::hud::life_icon_position;
+use crate::spawning::{self, backdrop_color};
 use crate::types::*;
 
-use super::players::{cannon_spawn_x, player_color};
-
 impl SpaceInvadersGame {
-    /// Actions that change the game state while the simulation screens are up.
-    /// Play is paused/restarted through the pause gate in `update_gameplay`;
-    /// here only game-over reacts — Action1 (Space/Enter/pad A) restarts and
-    /// Menu (Escape/pad Start) returns to the title.
+    /// Actions that change the game state while the match screens are up. Play pauses
+    /// and restarts through the pause gate in `update_gameplay`; here only game over
+    /// reacts — Action1 restarts and Menu returns to the title.
     pub(crate) fn handle_state_input(&mut self, ctx: &mut GameContext) {
         if let GameState::GameOver { .. } = &self.state {
             if ctx.players.just_activated_any(GameAction::Action1, ctx.input) {
@@ -23,47 +23,51 @@ impl SpaceInvadersGame {
         }
     }
 
-    /// Build a fresh roster for the chosen mode, rebuild the fleet and
-    /// barriers, spawn the cannons, and start the march. Called from mode
-    /// select and from game-over restart.
+    /// Build a fresh roster for the chosen mode, rebuild the fleet, the bunkers and the
+    /// cannons, and start the march. Called from the mode select and from a restart.
     pub(crate) fn start_game(&mut self, ctx: &mut GameContext) {
+        self.clear_match(ctx.world);
         self.march_dir = 1.0;
         self.formation_offset = Vec2::ZERO;
 
-        // Rebuild the cannons for this mode: fresh scores, lives, and bodies.
         let count = self.mode.player_count();
-        self.despawn_cannons(ctx.world);
-        self.players = (0..count).map(|_| PlayerState::fresh()).collect();
-
-        self.destroy_all_bullets(ctx.world);
-        self.destroy_ufo(ctx.world);
-        self.ufo_flash = 0.0;
-        self.destroy_fleet_and_barriers(ctx.world);
-        self.invaders = spawning::spawn_invaders(ctx.world, self.tex_id);
-        let theme = ChaosTheme::for_mode(self.chaos_mode);
-        self.barrier_blocks = spawning::spawn_barriers(ctx.world, self.tex_id, theme.structure_color);
-
+        self.players = (0..count)
+            .map(|index| PlayerState::fresh(Hero::for_player(index), cannon_spawn_x(count, index)))
+            .collect();
         for index in 0..count {
-            let x = cannon_spawn_x(count, index);
-            let color = player_color(index, &theme);
-            let entity = spawning::spawn_player(ctx.world, self.tex_id, color, x);
+            let (hero, x) = (self.players[index].hero, self.players[index].x);
+            let entity = spawning::spawn_cannon(ctx.world, self.sheets.hero(hero), hero, x);
             self.players[index].entity = Some(entity);
+            for life in 0..STARTING_LIVES {
+                let icon = spawning::spawn_life_icon(
+                    ctx.world, &self.sheets.life_icon, hero, life_icon_position(index, life));
+                self.life_icons.push((index, life, icon));
+            }
         }
 
+        self.invaders = spawning::spawn_invaders(ctx.world, &self.sheets);
+        self.bunker_blocks = spawning::spawn_bunkers(ctx.world, &self.sheets.butter_bunker);
         self.apply_theme(ctx.world);
         self.state = GameState::Playing;
     }
 
-    /// End the match, win or lose. Entities stay on screen behind the
-    /// game-over overlay; the next start rebuilds them.
+    /// End the match, win or lose. The scene stays on screen behind the game-over panel;
+    /// the next start rebuilds it.
     pub(crate) fn finish_game(&mut self, ctx: &mut GameContext, won: bool) {
-        // Both co-op cannons can fall to the same frame's volley: the first
-        // call ends the match, a second must not re-submit scores.
+        // Both co-op cannons can fall to the same frame's crumbs: the first call ends the
+        // match, a second must not re-submit scores.
         if let GameState::GameOver { .. } = self.state {
             return;
         }
-        self.destroy_all_bullets(ctx.world);
-        self.destroy_ufo(ctx.world);
+        // A surviving cannon caught mid-hurt by the match's end stands back up for the
+        // game-over scene: nothing runs its respawn timer after this.
+        for index in 0..self.players.len() {
+            if self.players[index].respawn_in.is_some() {
+                self.respawn_cannon(ctx.world, index);
+            }
+        }
+        self.destroy_all_shots(ctx.world);
+        self.destroy_flyer(ctx.world);
         let mode = match self.mode {
             GameMode::SinglePlayer => "single",
             GameMode::TwoPlayerCoop => "coop",
@@ -74,55 +78,64 @@ impl SpaceInvadersGame {
         self.state = GameState::GameOver { won };
     }
 
+    /// Leave the match for the title: every shot, flyer and one-shot goes, so nothing
+    /// plays on under the menus.
     pub(crate) fn reset_to_title(&mut self, world: &mut World) {
-        self.destroy_all_bullets(world);
-        self.destroy_ufo(world);
+        self.destroy_all_shots(world);
+        self.destroy_flyer(world);
+        self.clear_transient_visuals(world);
+        self.notice = None;
         self.state = GameState::TitleScreen { selection: 0 };
     }
 
-    pub(crate) fn destroy_all_bullets(&mut self, world: &mut World) {
-        let mut bullets: Vec<EntityId> = std::mem::take(&mut self.invader_bullets);
-        for player in &mut self.players {
-            bullets.append(&mut player.bullets);
-        }
-        for bullet in bullets {
-            self.physics.destroy_entity(world, bullet);
-        }
-    }
-
-    /// Destroy every cannon body and forget it. Called when rebuilding the
-    /// roster for a new match.
-    fn despawn_cannons(&mut self, world: &mut World) {
-        let entities: Vec<EntityId> = self.players.iter_mut()
-            .filter_map(|p| p.entity.take())
+    /// Everything a match spawned, gone: cannons, fleet, bunkers, shots, the flyer, the
+    /// life icons and every one-shot still playing.
+    fn clear_match(&mut self, world: &mut World) {
+        self.destroy_all_shots(world);
+        self.destroy_flyer(world);
+        self.clear_transient_visuals(world);
+        self.notice = None;
+        self.passing.clear();
+        let bodies: Vec<EntityId> = self.players.iter_mut().filter_map(|player| player.entity.take())
+            .chain(self.invaders.drain(..).map(|invader| invader.entity))
+            .chain(self.bunker_blocks.drain(..).map(|block| block.entity))
             .collect();
-        for entity in entities {
+        for entity in bodies {
             self.physics.destroy_entity(world, entity);
         }
+        for (_, _, icon) in self.life_icons.drain(..) {
+            world.remove_entity(&icon).ok();
+        }
+        self.bunkers = [Bunker::FRESH; BUNKER_COUNT];
     }
 
-    fn destroy_fleet_and_barriers(&mut self, world: &mut World) {
-        for invader in self.invaders.drain(..) {
-            self.physics.destroy_entity(world, invader.entity);
+    pub(crate) fn destroy_all_shots(&mut self, world: &mut World) {
+        let mut shots: Vec<EntityId> = self.enemy_shots.drain(..).map(|shot| shot.entity).collect();
+        for player in &mut self.players {
+            shots.append(&mut player.shots);
         }
-        for block in self.barrier_blocks.drain(..) {
-            self.physics.destroy_entity(world, block);
+        for shot in shots {
+            self.physics.destroy_entity(world, shot);
+        }
+        self.passing.clear();
+    }
+
+    /// End every burst, splash and hurt still playing or holding.
+    pub(crate) fn clear_transient_visuals(&mut self, world: &mut World) {
+        for entity in self.transient_visuals.drain(..) {
+            world.remove_entity(&entity).ok();
         }
     }
 
-    /// Push the current `chaos_mode`'s look onto the live entities:
-    /// background tint, player color, and a fresh grid.
-    pub(crate) fn apply_theme(&mut self, world: &mut World) {
-        let theme = ChaosTheme::for_mode(self.chaos_mode);
-        if let Some(bg) = self.background {
-            if let Some(s) = world.get_mut::<Sprite>(bg) { s.color = theme.bg_color; }
-        }
-        for index in 0..self.players.len() {
-            let color = player_color(index, &theme);
-            if let Some(entity) = self.players[index].entity {
-                if let Some(s) = world.get_mut::<Sprite>(entity) { s.color = color; }
+    /// Give the backdrop grid the chosen chaos mode's colour. The mode select is the only
+    /// thing that changes the mode, after `init()` spawned the backdrop. The chaos theme
+    /// is the accent layer only: no art is tinted by it.
+    pub(crate) fn apply_theme(&self, world: &mut World) {
+        let color = backdrop_color(&ChaosTheme::for_mode(self.chaos_mode));
+        if let Some(backdrop) = self.backdrop {
+            if let Some(grid) = world.get_mut::<GridBackdrop>(backdrop) {
+                grid.color = color;
             }
         }
-        self.grid = Some(default_playfield_grid(&theme));
     }
 }

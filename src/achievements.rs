@@ -1,9 +1,11 @@
-//! Space Invaders achievement definitions and unlock logic.
+//! Toast Busters' achievement definitions and unlock logic. The ids are the game's
+//! original ones, because the saves persist them; the titles and descriptions are
+//! Toast Busters'.
 //!
 //! Registered through `Game::register_achievements` — the engine calls it before the window
 //! opens, which is what lets `--achievements-manifest` export the list with no GPU. Clear/perfect achievements unlock from the
 //! win path in `gameplay::flow`; the sharpshooter streak unlocks live in
-//! `gameplay::combat` the moment the streak hits `SHARPSHOOTER_TARGET`.
+//! `gameplay::players` the moment the streak hits `SHARPSHOOTER_TARGET`.
 
 use engine_core::prelude::*;
 
@@ -28,7 +30,7 @@ pub(crate) const UFO_HUNTER:   &str = "ufo_hunter";
 /// Grouped display order for the achievements page. First tuple element is
 /// the section header, second is the list of ids to render under it.
 pub(crate) const DISPLAY_SECTIONS: &[(&str, &[&str])] = &[
-    ("Repelled Invasions",
+    ("Toast Busted",
         &[CLEAR_NORMAL, CLEAR_INSANE, CLEAR_RIDICULOUS, CLEAR_INSICULOUS]),
     ("Perfect Defenses",
         &[PERFECT_NORMAL, PERFECT_INSANE, PERFECT_RIDICULOUS, PERFECT_INSICULOUS]),
@@ -36,47 +38,47 @@ pub(crate) const DISPLAY_SECTIONS: &[(&str, &[&str])] = &[
         &[SHARPSHOOTER, LAST_STAND, UFO_HUNTER]),
 ];
 
-/// Register every Space Invaders achievement. Call once from `Game::register_achievements`.
+/// Register every Toast Busters achievement. Call once from `Game::register_achievements`.
 pub(crate) fn register_all(mgr: &mut AchievementManager) {
     mgr.register(Achievement::new(CLEAR_NORMAL,
-        "Earth Defender",
-        "Repel the invasion in Normal mode."));
+        "Counter Defender",
+        "Bust every Toasted in Normal mode."));
     mgr.register(Achievement::new(CLEAR_INSANE,
-        "Blitz Breaker",
-        "Repel the invasion in Insane mode."));
+        "Speed Toaster",
+        "Bust every Toasted in Insane mode."));
     mgr.register(Achievement::new(CLEAR_RIDICULOUS,
-        "Twin Cannon Commander",
-        "Repel the invasion in Ridiculous mode."));
+        "Twin Icicle Commander",
+        "Bust every Toasted in Ridiculous mode."));
     mgr.register(Achievement::new(CLEAR_INSICULOUS,
-        "Insiculous Overkill",
-        "Repel the invasion in Insiculous mode."));
+        "Insiculously Toasted",
+        "Bust every Toasted in Insiculous mode."));
 
     mgr.register(Achievement::new(PERFECT_NORMAL,
-        "Untouchable",
+        "Not a Crumb",
         "Clear Normal mode without losing a life."));
     mgr.register(Achievement::new(PERFECT_INSANE,
-        "Untouchable Under Fire",
+        "Not a Crumb Under Fire",
         "Clear Insane mode without losing a life."));
     mgr.register(Achievement::new(PERFECT_RIDICULOUS,
-        "Untouchable Overdrive",
+        "Not a Crumb Overdrive",
         "Clear Ridiculous mode without losing a life."));
     mgr.register(Achievement::new(PERFECT_INSICULOUS,
-        "Insiculously Untouchable",
+        "Insiculously Uncrumbed",
         "Clear Insiculous mode without losing a life."));
 
     mgr.register(Achievement::new(SHARPSHOOTER,
         "Sharpshooter",
-        "Land 10 kill shots in a row without wasting a bullet."));
+        "Bust 10 in a row without wasting a shot."));
     mgr.register(Achievement::new(LAST_STAND,
-        "Last Stand",
-        "Repel the invasion on your very last life."));
+        "Last Slice",
+        "Bust the last Toasted on your very last life."));
     mgr.register(Achievement::new(UFO_HUNTER,
-        "UFO Hunter",
-        "Shoot down a mystery ship."));
+        "Saucer Hunter",
+        "Shoot down Maxwell's cake saucer."));
 }
 
 impl SpaceInvadersGame {
-    /// Called from the win path when the last invader falls. Perfect means
+    /// Called from the win path when the last Toasted is busted. Perfect means
     /// no cannon lost a single life; last stand means some cannon repelled
     /// the fleet on its very last life. In single player both reduce to the
     /// lone cannon's tally.
@@ -88,7 +90,7 @@ impl SpaceInvadersGame {
         if self.players.iter().any(|p| p.lives == 1) {
             ctx.achievements.unlock(LAST_STAND);
         }
-        // SHARPSHOOTER (gameplay::combat) and UFO_HUNTER (gameplay::ufo)
+        // SHARPSHOOTER (gameplay::players) and UFO_HUNTER (gameplay::flyers)
         // unlock live, not here.
     }
 }

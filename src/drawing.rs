@@ -1,5 +1,8 @@
 use engine_core::prelude::*;
 use crate::achievements::DISPLAY_SECTIONS;
+use crate::art::SAUCER_BURST_COLOR;
+use crate::constants::{HUD_FONT_SIZE, JAMMER_POINTS};
+use crate::hud::{self, Slot};
 use crate::menu::{achievements_panel, mode_hint, mode_select_panel, title_label, title_panel, TITLE_ITEMS};
 use crate::types::*;
 
@@ -19,7 +22,7 @@ impl SpaceInvadersGame {
 
     fn draw_title(&self, ctx: &mut GameContext, selection: u8) {
         let style = self.menu_style();
-        let panel = title_panel("INSICULOUS INVADERS", ctx.window_size);
+        let panel = title_panel("TOAST BUSTERS", ctx.window_size);
         let mut y = panel.begin(ctx.ui, &style);
         for (i, &item) in TITLE_ITEMS.iter().enumerate() {
             y = panel.item(ctx.ui, y, title_label(item), i as u8 == selection, &style);
@@ -96,37 +99,13 @@ impl SpaceInvadersGame {
     }
 
     fn draw_gameplay(&self, ctx: &mut GameContext) {
-        let cx = ctx.window_size.x / 2.0;
-        let cy = ctx.window_size.y / 2.0;
-
-        self.draw_scoreboard(ctx);
-
-        let theme = ChaosTheme::for_mode(self.chaos_mode);
-        if let Some(banner) = theme.banner_text {
-            let color = Color::new(theme.banner_color.x, theme.banner_color.y, theme.banner_color.z, theme.banner_color.w);
-            ctx.ui.label_centered_styled(banner, Vec2::new(cx, ctx.window_size.y - 24.0), color, 16.0);
-        }
-
-        // Streak HUD shows the best streak going across the live cannons.
-        let streak = self.players.iter().map(|p| p.shot_streak).max().unwrap_or(0);
-        if streak >= 3 {
-            ctx.ui.label_centered(&format!("STREAK x{streak}"), Vec2::new(cx, 48.0));
-        }
-
-        if self.ufo_flash > 0.0 {
-            let c = crate::constants::UFO_COLOR;
-            ctx.ui.label_centered_styled(
-                &format!("UFO +{}", self.ufo_flash_bonus),
-                Vec2::new(cx, 72.0),
-                Color::new(c.x, c.y, c.z, c.w),
-                16.0,
-            );
-        }
+        let centre = ctx.window_size / 2.0;
+        self.draw_hud(ctx);
 
         if let GameState::GameOver { won } = &self.state {
-            let msg = if *won { "INVASION REPELLED!" } else { "EARTH HAS FALLEN" };
+            let message = if *won { "ALL RIGHT, THIS SLICE IS TOAST!" } else { "TOASTED" };
             let style = self.menu_style();
-            let panel = MenuPanel::new(msg, Vec2::new(cx, cy), 340.0, 2);
+            let panel = MenuPanel::new(message, centre, 400.0, 2);
             let mut y = panel.begin(ctx.ui, &style);
             y = panel.line(ctx.ui, y, &self.final_score_line(), &style);
             panel.line(ctx.ui, y, "SPACE or ENTER to play again", &style);
@@ -139,25 +118,26 @@ impl SpaceInvadersGame {
         }
     }
 
-    /// Score/lives HUD. Single player keeps the classic centered top row;
-    /// co-op splits P1 to the left and P2 to the right.
-    fn draw_scoreboard(&self, ctx: &mut GameContext) {
-        let right_x = ctx.window_size.x - 140.0;
-        match self.mode {
-            GameMode::SinglePlayer => {
-                let p = &self.players[0];
-                ctx.ui.label(&format!("SCORE {}", p.score), Vec2::new(40.0, 16.0));
-                ctx.ui.label(&lives_text(p.lives), Vec2::new(right_x, 16.0));
+    /// The HUD band, from `hud`'s map: each score and its streak, the chaos banner, and
+    /// the one transient. The life icons beside each score are world sprites.
+    fn draw_hud(&self, ctx: &mut GameContext) {
+        for (player, state) in self.players.iter().enumerate() {
+            let score = match self.mode {
+                GameMode::SinglePlayer => format!("SCORE {}", state.score),
+                GameMode::TwoPlayerCoop => format!("P{} {}", player + 1, state.score),
+            };
+            draw_in_slot(ctx, Slot::Score { player }, &score, HUD_TEXT_COLOR);
+            if state.shot_streak >= 3 {
+                draw_in_slot(ctx, Slot::Streak { player }, &format!("STREAK x{}", state.shot_streak), HUD_TEXT_COLOR);
             }
-            GameMode::TwoPlayerCoop => {
-                let p1 = &self.players[0];
-                ctx.ui.label(&format!("P1 {}", p1.score), Vec2::new(40.0, 16.0));
-                ctx.ui.label(&lives_text(p1.lives), Vec2::new(40.0, 36.0));
-                if let Some(p2) = self.players.get(1) {
-                    ctx.ui.label(&format!("P2 {}", p2.score), Vec2::new(right_x, 16.0));
-                    ctx.ui.label(&lives_text(p2.lives), Vec2::new(right_x, 36.0));
-                }
-            }
+        }
+
+        let theme = ChaosTheme::for_mode(self.chaos_mode);
+        if let Some(banner) = theme.banner_text {
+            draw_in_slot(ctx, Slot::Banner, banner, Color::from(theme.banner_color));
+        }
+        if let Some((notice, _)) = self.notice {
+            draw_in_slot(ctx, Slot::Transient, &notice_text(notice, self.mode), notice_color(notice));
         }
     }
 
@@ -176,7 +156,33 @@ impl SpaceInvadersGame {
     }
 }
 
-/// "LIVES * * *" from a life count (empty tail once a cannon is out).
-fn lives_text(lives: u32) -> String {
-    format!("LIVES {}", "* ".repeat(lives as usize).trim_end())
+const HUD_TEXT_COLOR: Color = Color::new(0.96, 0.92, 0.84, 1.0);
+
+/// Draw `text` in `slot`'s box, aligned as the slot reads.
+fn draw_in_slot(ctx: &mut GameContext, slot: Slot, text: &str, color: Color) {
+    let bounds = hud::slot_on_screen(ctx.window_size, slot);
+    ctx.ui.label_in_bounds_styled(text, bounds, hud::slot_alignment(slot), color, HUD_FONT_SIZE, 0.0);
 }
+
+/// What the transient slot says. A jam reads as the jammed player's own complaint solo,
+/// and names the player in co-op.
+pub(crate) fn notice_text(notice: Notice, mode: GameMode) -> String {
+    match notice {
+        Notice::SaucerBonus(bonus) => format!("SAUCER +{bonus}"),
+        Notice::JammerBusted => format!("JAMMER +{JAMMER_POINTS}"),
+        Notice::Jammed { player } => match mode {
+            GameMode::SinglePlayer => "HE JAMMED ME!".to_string(),
+            GameMode::TwoPlayerCoop => format!("P{} JAMMED!", player + 1),
+        },
+    }
+}
+
+fn notice_color(notice: Notice) -> Color {
+    match notice {
+        Notice::SaucerBonus(_) => Color::from(SAUCER_BURST_COLOR),
+        Notice::JammerBusted | Notice::Jammed { .. } => Color::from(JAM_TEXT_COLOR),
+    }
+}
+
+/// Grape jam, lightened to read on the dark band.
+const JAM_TEXT_COLOR: Vec4 = Vec4::new(0.78, 0.6, 0.95, 1.0);

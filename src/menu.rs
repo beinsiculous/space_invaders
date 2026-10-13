@@ -62,10 +62,10 @@ pub(crate) fn title_index(item: TitleItem) -> u8 {
 /// One-line description of what each chaos mode means in this game.
 pub(crate) fn mode_hint(mode: ChaosMode) -> &'static str {
     match mode {
-        ChaosMode::Normal => "The classic invasion.",
-        ChaosMode::Insane => "The fleet marches faster - you get 4 shots in the air.",
-        ChaosMode::Ridiculous => "The fleet fires relentlessly - answer with twin cannons.",
-        ChaosMode::Insiculous => "Fast AND relentless - stack twin-cannon volleys.",
+        ChaosMode::Normal => "The classic: hold the counter against the Toasted.",
+        ChaosMode::Insane => "The Toasted march faster - you get 4 shots in the air.",
+        ChaosMode::Ridiculous => "The Toasted fire relentlessly - answer with twin volleys.",
+        ChaosMode::Insiculous => "Fast AND relentless - stack twin volleys.",
     }
 }
 
