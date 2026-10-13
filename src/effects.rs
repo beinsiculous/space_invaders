@@ -1,6 +1,5 @@
 //! Particle presets — the accent layer over the drawn bursts and splashes. Each event's
-//! look is tuned here in one place; the backdrop grid is the engine's, and gameplay only
-//! ripples it.
+//! look is tuned here in one place.
 
 use engine_core::prelude::*;
 

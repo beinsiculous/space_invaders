@@ -99,28 +99,6 @@ pub(crate) fn spawn_countertop(world: &mut World, sheet: &SpriteSheet) -> Entity
     world.spawn().with(Name::new("Countertop")).with(Transform2D::new(anchor)).with(map).id()
 }
 
-/// The backdrop grid's colour for a chaos theme: its grid colour at the low alpha that
-/// lets the lattice read over the countertop without veiling it.
-pub(crate) fn backdrop_color(theme: &ChaosTheme) -> Vec4 {
-    let grid = theme.grid_color;
-    Vec4::new(grid.x, grid.y, grid.z, BACKDROP_ALPHA)
-}
-
-/// Spawn the deforming grid drawn over the art — the countertop is an opaque map, so a
-/// lattice under the sprites would never show. The engine simulates and draws it;
-/// gameplay events ripple it.
-pub(crate) fn spawn_backdrop(world: &mut World, theme: &ChaosTheme) -> EntityId {
-    world.spawn()
-        .with(Name::new("Grid Backdrop"))
-        .with(Transform2D::new(Vec2::ZERO))
-        .with(GridBackdrop {
-            draw_order: GridDrawOrder::OverSprites,
-            color: backdrop_color(theme),
-            ..GridBackdrop::default()
-        })
-        .id()
-}
-
 /// The cell centre of formation slot (`row`, `column`) before any march.
 pub(crate) fn invader_home_cell(row: usize, column: usize) -> Vec2 {
     Vec2::new(column_cell_x(column), ROW_CELL_Y[row.min(ROW_CELL_Y.len() - 1)])

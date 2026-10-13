@@ -259,14 +259,18 @@ fn a_restart_or_a_quit_ends_every_one_shot_and_every_shot() {
 }
 
 #[test]
-fn the_countertop_and_the_grid_stay_up_under_the_menus() {
-    let harness = title_harness();
-    let game = harness.game();
-    let countertop = game.countertop.expect("the countertop");
+fn the_countertop_stays_up_under_the_menus_and_no_lattice_draws_over_its_grout() {
+    let mut harness = title_harness();
+    let countertop = harness.game().countertop.expect("the countertop");
     let map = harness.world().get::<Tilemap>(countertop).expect("a map");
     assert!(map.width as f32 * COUNTERTOP_TILE_PX >= WIN_W && map.height as f32 * COUNTERTOP_TILE_PX >= WIN_H);
-    let backdrop = game.backdrop.expect("the backdrop");
-    let grid = harness.world().get::<GridBackdrop>(backdrop).expect("a grid");
-    assert_eq!(grid.draw_order, GridDrawOrder::OverSprites);
-    assert_eq!(grid.color.w, BACKDROP_ALPHA);
+    let lattices = |harness: &engine_core::test_support::GameHarness<SpaceInvadersGame>| {
+        harness.world().entities().into_iter()
+            .filter(|&entity| harness.world().get::<GridBackdrop>(entity).is_some())
+            .count()
+    };
+    assert_eq!(lattices(&harness), 0, "the grout is the grid; a lattice over it reads as two");
+    harness.context(|game, ctx| game.start_game(ctx));
+    step_quietly(&mut harness, 1, &[]);
+    assert_eq!(lattices(&harness), 0, "nor in a match");
 }

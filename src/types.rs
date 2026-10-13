@@ -297,8 +297,6 @@ pub struct SpaceInvadersGame {
     pub(crate) passing: Vec<(EntityId, EntityId)>,
     /// The countertop's `Tilemap`, under everything; it stays up under the menus.
     pub(crate) countertop: Option<EntityId>,
-    /// The deforming grid drawn over the art; the engine steps and draws it.
-    pub(crate) backdrop: Option<EntityId>,
     /// The HUD's life icons, one per life a player started with: (player, index, entity).
     pub(crate) life_icons: Vec<(usize, u32, EntityId)>,
     /// Detached one-shots — bursts, splashes and the cannons' hurts — kept so a restart
@@ -336,7 +334,6 @@ impl Default for SpaceInvadersGame {
             enemy_shots: Vec::new(),
             passing: Vec::new(),
             countertop: None,
-            backdrop: None,
             life_icons: Vec::new(),
             transient_visuals: Vec::new(),
             // One cannon until the title menu picks a mode and `start_game` rebuilds

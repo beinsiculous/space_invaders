@@ -142,16 +142,6 @@ pub(crate) const INSICULOUS_MAX_PLAYER_SHOTS: usize = 6;
 /// Extra margin past the window edge before a shot is culled.
 pub(crate) const SHOT_CULL_PAD: f32 = 30.0;
 
-// --- the backdrop grid --------------------------------------------------------------------
-
-/// The backdrop grid's alpha, well under the preset's resting value: the lattice reads
-/// over the countertop without veiling it.
-pub(crate) const BACKDROP_ALPHA: f32 = 0.25;
-pub(crate) const GRID_IMPULSE_KILL_STRENGTH: f32 = 260.0;
-pub(crate) const GRID_IMPULSE_KILL_RADIUS: f32 = 90.0;
-pub(crate) const GRID_IMPULSE_PLAYER_HIT_STRENGTH: f32 = 700.0;
-pub(crate) const GRID_IMPULSE_PLAYER_HIT_RADIUS: f32 = 160.0;
-
 /// Collider outlines for the F1 overlay.
 pub(crate) const DEBUG_COLLIDER_COLOR: Vec4 = Vec4::new(1.0, 0.2, 1.0, 0.9);
 pub(crate) const DEBUG_COLLIDER_EMISSIVE: f32 = 2.0;

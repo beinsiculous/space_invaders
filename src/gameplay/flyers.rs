@@ -11,7 +11,7 @@ use crate::spawning::{flyer_art, spawn_effect, spawn_flyer, Effect};
 use crate::types::*;
 
 use super::players::ShotOutcome;
-use super::{entity_position, ripple_grid};
+use super::entity_position;
 
 // Distinct hash streams so the flyby draws don't correlate with the formation's fire
 // (which draws on the bare frame count).
@@ -117,9 +117,6 @@ impl SpaceInvadersGame {
                     self.transient_visuals.push(splatter);
                 }
             }
-        }
-        if let Some(position) = position {
-            ripple_grid(ctx.world, position, GRID_IMPULSE_KILL_STRENGTH, GRID_IMPULSE_KILL_RADIUS);
         }
         self.destroy_flyer(ctx.world);
         self.finish_player_shot(ctx, index, shot, ShotOutcome::Kill);

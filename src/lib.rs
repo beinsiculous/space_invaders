@@ -35,7 +35,7 @@ mod web_entry;
 use engine_core::prelude::*;
 use art::*;
 use constants::*;
-use spawning::{spawn_backdrop, spawn_countertop};
+use spawning::spawn_countertop;
 use types::*;
 
 pub use types::SpaceInvadersGame;
@@ -114,10 +114,10 @@ impl Game for SpaceInvadersGame {
             *field = load_sheet(ctx.assets, spec);
         }
 
-        // The countertop and the grid over it stay up under the menus; the cannons, the
-        // fleet and the bunkers spawn fresh in `start_game()` once the menus pick a mode.
+        // The countertop stays up under the menus; the cannons, the fleet and the bunkers
+        // spawn fresh in `start_game()` once the menus pick a mode. No lattice draws over it:
+        // its grout is the grid, and a second one over it read as two.
         self.countertop = Some(spawn_countertop(ctx.world, &self.sheets.countertop));
-        self.backdrop = Some(spawn_backdrop(ctx.world, &ChaosTheme::for_mode(self.chaos_mode)));
     }
 
     fn update(&mut self, ctx: &mut GameContext) {

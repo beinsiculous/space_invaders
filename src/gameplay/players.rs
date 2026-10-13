@@ -10,7 +10,7 @@ use crate::spawning::{face, spawn_effect, spawn_shot, Effect, ShotRecipe};
 use crate::types::*;
 
 use super::combat::player_fire_caps;
-use super::{clip_state, entity_position, ripple_grid};
+use super::{clip_state, entity_position};
 
 /// Whether a fresh volley of `shots` fits under `max_live` given the cannon's own shots
 /// already in flight. Each cannon checks its own, so one player firing at cap never
@@ -204,7 +204,6 @@ impl SpaceInvadersGame {
         let position = entity_position(ctx.world, entity).unwrap_or(Vec2::new(self.players[index].x, cannon_y(hero)));
         let theme = ChaosTheme::for_mode(self.chaos_mode);
         ctx.particles.spawn_burst(position, &crate::effects::player_hit_burst(&theme, self.sheets.white));
-        ripple_grid(ctx.world, position, GRID_IMPULSE_PLAYER_HIT_STRENGTH, GRID_IMPULSE_PLAYER_HIT_RADIUS);
 
         self.destroy_all_shots(ctx.world);
         let player = &mut self.players[index];

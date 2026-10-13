@@ -43,12 +43,6 @@ pub(crate) fn clip_state(world: &World, entity: EntityId) -> Option<String> {
     world.get::<ClipStateMachine>(entity).map(|machine| machine.state().to_string())
 }
 
-/// Push a radial shockwave into the backdrop grid. The engine applies it to every
-/// backdrop on its next running frame.
-pub(crate) fn ripple_grid(world: &mut World, position: Vec2, strength: f32, radius: f32) {
-    ripple(world, GridImpulse::Radial { position, strength, radius, attractive: false });
-}
-
 impl SpaceInvadersGame {
     pub(crate) fn update_gameplay(&mut self, ctx: &mut GameContext) {
         // F1 toggles the collider debug overlay. Magenta outlines render on
@@ -72,8 +66,7 @@ impl SpaceInvadersGame {
                 PauseAction::Idle => {}
             }
             if self.pause.is_active() {
-                // The engine holds the backdrop grid still with the rest of the world,
-                // so only the collider overlay is still ours to draw.
+                // The engine holds the world still; only the collider overlay is ours to draw.
                 self.emit_collider_overlay(ctx);
                 return;
             }
@@ -109,9 +102,8 @@ impl SpaceInvadersGame {
         self.emit_collider_overlay(ctx);
     }
 
-    /// Outline every collider in bright magenta while F1 is on. The backdrop grid is the
-    /// engine's to draw, so the collider overlay is the only line-buffer work the game
-    /// owns — and it draws last, over the grid and the art.
+    /// Outline every collider in bright magenta while F1 is on — the only line-buffer work
+    /// the game owns, drawn over the art.
     pub(crate) fn emit_collider_overlay(&self, ctx: &mut GameContext) {
         if self.debug_colliders {
             debug::draw_colliders(ctx.world, ctx.lines, DEBUG_COLLIDER_COLOR, DEBUG_COLLIDER_EMISSIVE);
@@ -133,8 +125,8 @@ impl SpaceInvadersGame {
         self.notice = Some((notice, NOTICE_SECONDS));
     }
 
-    /// Gameplay sprites only show in a match (playing or game over); the countertop and
-    /// the grid over it stay up under the menus. A cannon waiting out a surviving hit is
+    /// Gameplay sprites only show in a match (playing or game over); the countertop stays
+    /// up under the menus. A cannon waiting out a surviving hit is
     /// hidden, and each life icon shows only while its index is below its player's lives.
     pub(crate) fn update_entity_visibility(&self, ctx: &mut GameContext) {
         let in_match = matches!(self.state, GameState::Playing | GameState::GameOver { .. });

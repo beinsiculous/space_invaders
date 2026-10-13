@@ -6,7 +6,7 @@ use engine_core::prelude::*;
 use crate::art::Hero;
 use crate::constants::*;
 use crate::hud::life_icon_position;
-use crate::spawning::{self, backdrop_color};
+use crate::spawning;
 use crate::types::*;
 
 impl SpaceInvadersGame {
@@ -47,7 +47,6 @@ impl SpaceInvadersGame {
 
         self.invaders = spawning::spawn_invaders(ctx.world, &self.sheets);
         self.bunker_blocks = spawning::spawn_bunkers(ctx.world, &self.sheets.butter_bunker);
-        self.apply_theme(ctx.world);
         self.state = GameState::Playing;
     }
 
@@ -124,18 +123,6 @@ impl SpaceInvadersGame {
     pub(crate) fn clear_transient_visuals(&mut self, world: &mut World) {
         for entity in self.transient_visuals.drain(..) {
             world.remove_entity(&entity).ok();
-        }
-    }
-
-    /// Give the backdrop grid the chosen chaos mode's colour. The mode select is the only
-    /// thing that changes the mode, after `init()` spawned the backdrop. The chaos theme
-    /// is the accent layer only: no art is tinted by it.
-    pub(crate) fn apply_theme(&self, world: &mut World) {
-        let color = backdrop_color(&ChaosTheme::for_mode(self.chaos_mode));
-        if let Some(backdrop) = self.backdrop {
-            if let Some(grid) = world.get_mut::<GridBackdrop>(backdrop) {
-                grid.color = color;
-            }
         }
     }
 }

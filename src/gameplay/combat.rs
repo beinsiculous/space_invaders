@@ -10,7 +10,7 @@ use crate::types::*;
 
 use super::bunkers::Chip;
 use super::players::ShotOutcome;
-use super::{entity_position, rects_overlap, ripple_grid};
+use super::{entity_position, rects_overlap};
 
 /// Which live column returns fire, from a pseudo-random draw. `live_columns` must be
 /// non-empty; the draw wraps over it.
@@ -177,7 +177,6 @@ impl SpaceInvadersGame {
                 depth: CROUTON_BURST_DEPTH, clip: BURST_DIE, position, facing: Facing::Right,
             }, false);
             self.transient_visuals.push(burst);
-            ripple_grid(ctx.world, position, GRID_IMPULSE_KILL_STRENGTH, GRID_IMPULSE_KILL_RADIUS);
         }
         self.physics.destroy_entity(ctx.world, invader.entity);
         ShotOutcome::Kill
