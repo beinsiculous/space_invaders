@@ -27,6 +27,8 @@ mod menu;
 mod spawning;
 #[cfg(test)]
 mod test_support;
+#[cfg(test)]
+mod title_screen_tests;
 mod types;
 
 #[cfg(target_arch = "wasm32")]
@@ -86,6 +88,7 @@ impl Game for SpaceInvadersGame {
         if let Ok(white) = ctx.assets.create_solid_color(1, 1, [255, 255, 255, 255]) {
             self.sheets.white = white.id;
         }
+        self.title_art = TitleArt::load(ctx.assets, TITLE_ART);
 
         // Every sheet's path and cell is in `art.rs`; each PNG and its `.sheet.ron`
         // sidecar is a synced copy under `assets/sprites/`.

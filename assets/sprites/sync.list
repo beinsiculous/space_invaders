@@ -9,11 +9,11 @@
 # It carries the startup cards and the engine's window icon, which every game
 # shows, and Toast Busters' nineteen sheets: the four Toasted, the two flyers,
 # the bunker, the four projectiles, the four bursts and splashes, the countertop,
-# Deion and Cubert, and the life icons. The quarantined
+# Deion and Cubert, the life icons, and the title art. The quarantined
 # `ai_` prefix stays on the copies: a paid build's check_no_ai_assets.sh gate must
 # still find them until Jesse's cleanup pass.
 #
-# deion_assets 5abb22f8a91bad4ef77085bd604e16e3dd835580
+# deion_assets d9ecc155cab2be809b0b37a2c8aca16e85d52143
 ai/branding/be_insiculous/ai_be_insiculous_320x192.png
 ai/branding/insiculous_2d_maxwell/ai_insiculous_2d_maxwell_splash_320x192.png
 ai/branding/insiculous_2d_maxwell/ai_insiculous_2d_maxwell_icon_64x64.png
@@ -36,3 +36,4 @@ ai/sidescroller/tiles/toast_busters_countertop/ai_countertop_64x64.png
 ai/sidescroller/deion/ai_deion.png
 ai/sidescroller/cubert/ai_cubert.png
 ai/sidescroller/props/busters_life_icon/ai_busters_life_icon_16x16.png
+ai/title_screens/toast_busters/ai_toast_busters_title_480x288.png

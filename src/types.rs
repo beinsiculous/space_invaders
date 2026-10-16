@@ -281,6 +281,8 @@ impl Default for Sheets {
 pub struct SpaceInvadersGame {
     pub(crate) physics: PhysicsSystem,
     pub(crate) sheets: Sheets,
+    /// Toast Busters' title art over the title menu; `None` keeps the plain centred menu.
+    pub(crate) title_art: Option<TitleArt>,
 
     pub(crate) invaders: Vec<Invader>,
     /// What is crossing the flyby lane, if anything: one flyer at a time.
@@ -326,6 +328,7 @@ impl Default for SpaceInvadersGame {
         Self {
             physics: PhysicsSystem::with_config(PhysicsConfig::top_down()),
             sheets: Sheets::default(),
+            title_art: None,
             invaders: Vec::new(),
             flyer: None,
             notice: None,
