@@ -6,11 +6,11 @@
 //! byte-identical to the native JSON save files (achievements, high
 //! scores, input bindings). The key naming and the `insiculous-save`
 //! event the site listens for are the engine's `docs/WEB_SAVES.md`
-//! contract — the site slug for this game is `invaders`.
+//! contract — the site slug for this game is `toast-busters`.
 //!
 //! With `--features editor` the same library builds a SECOND bundle, served at
-//! `/playground/invaders/`, that runs this game inside the engine's scene editor.
-//! That bundle writes none of the `beinsiculous.games.invaders.*` keys above — an
+//! `/playground/toast-busters/`, that runs this game inside the engine's scene editor.
+//! That bundle writes none of the `beinsiculous.games.toast-busters.*` keys above — an
 //! editor session must not record achievements, scores or bindings the site's
 //! boards read — and keeps its camera and panel layout in a slot of its own.
 
@@ -34,7 +34,7 @@ use std::path::PathBuf;
 /// 3. the site's `src/content/games/<slug>.md` `wasm:` path,
 /// 4. the deployed dir `insiculous_web/public/games/<slug>/v<N>/`.
 #[cfg(not(feature = "editor"))]
-const ASSET_BASE: &str = "/games/invaders/v5/assets";
+const ASSET_BASE: &str = "/games/toast-busters/v6/assets";
 
 /// Where the editor bundle serves its assets from; also its VFS key base.
 ///
@@ -80,9 +80,14 @@ pub fn start() {
 #[cfg(not(feature = "editor"))]
 fn run_configured_game() -> Result<(), engine_core::EngineError> {
     let config = crate::game_config(ASSET_BASE)
-        .with_achievement_save_path("beinsiculous.games.invaders.achievements")
-        .with_input_settings_path("beinsiculous.games.invaders.input")
-        .with_score_save_path("beinsiculous.games.invaders.scores");
+        .with_achievement_save_path("beinsiculous.games.toast-busters.achievements")
+        .with_input_settings_path("beinsiculous.games.toast-busters.input")
+        .with_score_save_path("beinsiculous.games.toast-busters.scores")
+        // The keys this game saved under before its rename: read at boot and folded
+        // in, never written, so a player keeps their progress across the rename.
+        .with_former_achievement_save_path("beinsiculous.games.invaders.achievements")
+        .with_former_input_settings_path("beinsiculous.games.invaders.input")
+        .with_former_score_save_path("beinsiculous.games.invaders.scores");
     run_game(crate::SpaceInvadersGame::default(), config)
 }
 

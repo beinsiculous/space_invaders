@@ -53,7 +53,7 @@ fn load_sheet(assets: &mut AssetManager, spec: &SheetSpec) -> SpriteSheet {
 /// The shared `GameConfig` for every target. Entry points add their own
 /// platform extras on top — both configure the same save documents, just
 /// addressed differently (native: file paths anchored to the game dir;
-/// web: `beinsiculous.games.invaders.*` localStorage keys per the
+/// web: `beinsiculous.games.toast-busters.*` localStorage keys per the
 /// engine's `docs/WEB_SAVES.md`).
 ///
 /// `asset_base` must be an ANCHORED base: native callers pass an absolute

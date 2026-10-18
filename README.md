@@ -14,7 +14,7 @@ cargo run --features editor   # play inside the engine's scene editor
 cargo test                    # 68 headless tests
 ```
 
-The same build runs in the browser at [beinsiculous.com/playground/invaders/](https://beinsiculous.com/playground/invaders/): the game inside the editor, layout only — the rules are compiled in and nothing you change there persists.
+The same build runs in the browser at [beinsiculous.com/playground/toast-busters/](https://beinsiculous.com/playground/toast-busters/): the game inside the editor, layout only — the rules are compiled in and nothing you change there persists.
 
 Requires the `insiculous_2d` engine checked out side by side
 (`../../insiculous_2d`) — the Cargo dependency is a relative path.
@@ -69,7 +69,9 @@ is player 1 and Cubert player 2, each on their own slot. Bindings persist to
 
 Toast Busters' levels — one bread per level, the level cards, Poptergeist and Pain
 Perdu, the toast shading by chaos tier, and Stay Pufft's finale — are their own batch
-(`space_invaders#3`). The site still lists the game as *Insiculous Invaders*.
+(`space_invaders#3`). The site names the game **Toast Busters** at `/games/toast-busters/`, the
+former `/games/invaders/` redirecting there; its web save keys are `beinsiculous.games.toast-busters.*`,
+with the former `beinsiculous.games.invaders.*` keys read at boot.
 
 The art is quarantined AI-assisted pixel art (`ai_` prefix, synced from
 `deion_assets`): it ships in free builds only until a person's cleanup pass.
