@@ -1,9 +1,15 @@
 {
   "unlocks": {
+    "clear_normal": {
+      "unlocked_at": 1783969178
+    },
+    "ufo_hunter": {
+      "unlocked_at": 1791922450
+    },
     "sharpshooter": {
       "unlocked_at": 1783968913
     },
-    "clear_normal": {
+    "last_stand": {
       "unlocked_at": 1783969178
     },
     "clear_ridiculous": {
@@ -11,9 +17,6 @@
     },
     "perfect_ridiculous": {
       "unlocked_at": 1783969228
-    },
-    "last_stand": {
-      "unlocked_at": 1783969178
     }
   }
 }
