@@ -24,6 +24,9 @@ mod gameplay_tests;
 mod flow_tests;
 mod hud;
 mod menu;
+mod music;
+#[cfg(test)]
+mod music_tests;
 mod spawning;
 #[cfg(test)]
 mod test_support;
@@ -121,10 +124,13 @@ impl Game for SpaceInvadersGame {
         // spawn fresh in `start_game()` once the menus pick a mode. No lattice draws over it:
         // its grout is the grid, and a second one over it read as two.
         self.countertop = Some(spawn_countertop(ctx.world, &self.sheets.countertop));
+        self.music.game.start(ctx);
+        log::info!("toast busters: init complete");
     }
 
     fn update(&mut self, ctx: &mut GameContext) {
         self.frame_count = self.frame_count.wrapping_add(1);
+        self.music.update(ctx);
 
         match self.state.clone() {
             GameState::TitleScreen { selection } => self.update_title_input(ctx, selection),

@@ -7,64 +7,9 @@ use engine_core::test_support::GameHarness;
 
 use crate::art::*;
 use crate::constants::*;
-use crate::spawning::{block_tex_region, invader_home, spawn_flyer};
+use crate::spawning::{block_tex_region, spawn_flyer};
 use crate::test_support::*;
 use crate::types::*;
-
-/// Put a fresh shot of player `index` 2 px under the body `target` will have after the
-/// next physics step, its centre line at `x_in_cell` of that body's cell, flying up. The
-/// shot is spawned and stepped once first, so its body exists and moves on the very next
-/// step — the step that decides first contact — and the target is predicted after it.
-fn shoot_into(harness: &mut GameHarness<SpaceInvadersGame>, index: usize, target: Target, x_in_cell: f32) -> EntityId {
-    let shot = harness.context(|game, ctx| {
-        game.spawn_player_shot(ctx.world, index, Vec2::new(0.0, -250.0));
-        *game.players[index].shots.last().expect("the shot")
-    });
-    step_quietly(harness, 1, &target.keep());
-    let (body, spec) = target.next_body(harness);
-    harness.context(|game, _| {
-        let hero = game.players[index].hero;
-        let cell_left = body.x + spec.sprite_offset().x - spec.cell.x / 2.0;
-        let below = body.y - half_size(spec).y - player_shot_half_collider(hero).y - 2.0;
-        game.physics.reset_body(shot, Vec2::new(cell_left + x_in_cell, below));
-        game.physics.set_velocity(shot, Vec2::new(0.0, PLAYER_SHOT_SPEED), 0.0);
-    });
-    shot
-}
-
-/// What a test shoots at.
-#[derive(Clone, Copy)]
-enum Target {
-    Invader(EntityId),
-    Flyer(EntityId),
-}
-
-impl Target {
-    fn keep(self) -> Vec<EntityId> {
-        match self {
-            Target::Invader(_) => Vec::new(),
-            Target::Flyer(entity) => vec![entity],
-        }
-    }
-
-    /// Where the target's body stands after the next physics step, and its sheet. A
-    /// kinematic body reaches the target set the frame before: a Toasted's is its home
-    /// plus the formation offset, a flyer's one frame of flight on from where it is.
-    fn next_body(self, harness: &GameHarness<SpaceInvadersGame>) -> (Vec2, &'static SheetSpec) {
-        let game = harness.game();
-        match self {
-            Target::Invader(entity) => {
-                let invader = game.invaders.iter().find(|invader| invader.entity == entity).expect("alive");
-                (invader_home(invader.row, invader.column) + game.formation_offset, invader.kind.spec().sheet)
-            }
-            Target::Flyer(entity) => {
-                let flyer = game.flyer.as_ref().expect("a flyer");
-                let step = Vec2::new(flyer.direction * FLYER_SPEED * FRAME, 0.0);
-                (position_of(harness, entity) + step, crate::spawning::flyer_art(flyer.kind).0)
-            }
-        }
-    }
-}
 
 fn invader_of(harness: &GameHarness<SpaceInvadersGame>, kind: Toasted) -> Option<EntityId> {
     harness.game().invaders.iter().find(|invader| invader.kind == kind).map(|invader| invader.entity)

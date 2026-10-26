@@ -48,6 +48,7 @@ impl SpaceInvadersGame {
         self.invaders = spawning::spawn_invaders(ctx.world, &self.sheets);
         self.bunker_blocks = spawning::spawn_bunkers(ctx.world, &self.sheets.butter_bunker);
         self.state = GameState::Playing;
+        self.music.restart(ctx, &self.invaders);
     }
 
     /// End the match, win or lose. The scene stays on screen behind the game-over panel;
@@ -67,6 +68,7 @@ impl SpaceInvadersGame {
         }
         self.destroy_all_shots(ctx.world);
         self.destroy_flyer(ctx.world);
+        self.music.rest_bob(ctx.world, &self.invaders);
         let mode = match self.mode {
             GameMode::SinglePlayer => "single",
             GameMode::TwoPlayerCoop => "coop",
@@ -82,6 +84,7 @@ impl SpaceInvadersGame {
     pub(crate) fn reset_to_title(&mut self, world: &mut World) {
         self.destroy_all_shots(world);
         self.destroy_flyer(world);
+        self.music.rest_bob(world, &self.invaders);
         self.clear_transient_visuals(world);
         self.notice = None;
         self.state = GameState::TitleScreen { selection: 0 };

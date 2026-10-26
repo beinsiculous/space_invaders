@@ -8,6 +8,7 @@ use engine_core::prelude::*;
 use crate::art::*;
 use crate::constants::*;
 use crate::spawning::{flyer_art, spawn_effect, spawn_flyer, Effect};
+use crate::music::Moment;
 use crate::types::*;
 
 use super::players::ShotOutcome;
@@ -38,6 +39,12 @@ pub(crate) fn flyer_offscreen(cell_x: f32, direction: f32, kind: FlyerKind) -> b
     cell_x * direction > WIN_W / 2.0 + flyer_art(kind).0.cell.x
 }
 
+/// Whether the empty lane sends a flyer on frame `frame`: a pseudo-random draw against the
+/// spawn rate.
+pub(crate) fn flyer_spawn_rolls(frame: u32, delta_time: f32) -> bool {
+    hash_f32(frame.wrapping_add(SPAWN_SALT)) < FLYER_SPAWN_RATE * delta_time
+}
+
 /// The saucer's mystery bonus for a kill, drawn from the classic table.
 pub(crate) fn saucer_bonus(rand: u32) -> u32 {
     SAUCER_BONUS_VALUES[rand as usize % SAUCER_BONUS_VALUES.len()]
@@ -48,11 +55,12 @@ impl SpaceInvadersGame {
     /// while it is over the field, and retire it past the far edge.
     pub(crate) fn update_flyer(&mut self, ctx: &mut GameContext) {
         let Some(flyer) = self.flyer.as_mut() else {
-            if hash_f32(self.frame_count.wrapping_add(SPAWN_SALT)) < FLYER_SPAWN_RATE * ctx.delta_time {
+            if flyer_spawn_rolls(self.frame_count, ctx.delta_time) {
                 let kind = flyer_kind_for(hash_u32(self.frame_count.wrapping_add(KIND_SALT)));
                 let (cell_x, direction) = flyer_entry(hash_u32(self.frame_count.wrapping_add(DIRECTION_SALT)), kind);
                 let entity = spawn_flyer(ctx.world, self.sheets.flyer(kind), kind, cell_x);
                 self.flyer = Some(Flyer { entity, kind, direction, glob_in: JAM_GLOB_INTERVAL });
+                self.music.play(ctx, Moment::Flyer(entity));
             }
             return;
         };
@@ -119,6 +127,7 @@ impl SpaceInvadersGame {
             }
         }
         self.destroy_flyer(ctx.world);
+        self.music.play(ctx, Moment::Bonus);
         self.finish_player_shot(ctx, index, shot, ShotOutcome::Kill);
     }
 

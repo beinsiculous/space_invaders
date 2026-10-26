@@ -1,0 +1,145 @@
+(
+    version: 1,
+    soundfont: "soundfonts/toast_busters.sf2",
+    looping: true,
+    parts: [
+        (
+            name: "bones",
+            track: Name("bones"),
+            mode: Loop,
+            quantize: Off,
+        ),
+        (
+            name: "pluck",
+            track: Name("pluck"),
+            mode: AtSongPosition,
+            quantize: Off,
+        ),
+        (
+            name: "chime",
+            track: Name("chime"),
+            mode: Loop,
+            quantize: Off,
+        ),
+        (
+            name: "bonus",
+            track: Name("bonus"),
+            mode: Loop,
+            quantize: Off,
+        ),
+        (
+            name: "hurt",
+            track: Name("hurt"),
+            mode: Loop,
+            quantize: Off,
+        ),
+        (
+            name: "clear",
+            track: Name("stinger"),
+            mode: Loop,
+            quantize: Off,
+        ),
+        (
+            name: "jam",
+            track: Name("jam"),
+            mode: Loop,
+            quantize: Off,
+        ),
+    ],
+    instruments: [
+        (
+            name: "xylophone",
+            source: SoundFont(
+                path: "soundfonts/toast_busters.sf2",
+                bank: 0,
+                preset: 13,
+            ),
+        ),
+        (
+            name: "clarinet",
+            source: SoundFont(
+                path: "soundfonts/toast_busters.sf2",
+                bank: 0,
+                preset: 71,
+            ),
+        ),
+        (
+            name: "bells",
+            source: SoundFont(
+                path: "soundfonts/toast_busters.sf2",
+                bank: 0,
+                preset: 14,
+            ),
+        ),
+        (
+            name: "bass",
+            source: SoundFont(
+                path: "soundfonts/toast_busters.sf2",
+                bank: 0,
+                preset: 32,
+            ),
+        ),
+    ],
+    bindings: [
+        (
+            action: "plain_wraith",
+            part: "bones",
+            instrument: "xylophone",
+        ),
+        (
+            action: "rye_ip",
+            part: "bones",
+            instrument: "clarinet",
+        ),
+        (
+            action: "bagelgeist",
+            part: "bones",
+            instrument: "bells",
+        ),
+        (
+            action: "sour_doom",
+            part: "bones",
+            instrument: "bass",
+        ),
+        (
+            action: "singe",
+            part: "bones",
+            instrument: "bass",
+        ),
+        (
+            action: "shot",
+            part: "pluck",
+            instrument: "bass",
+        ),
+        (
+            action: "flyer",
+            part: "chime",
+            instrument: "bells",
+        ),
+        (
+            action: "bonus",
+            part: "bonus",
+            instrument: "bells",
+        ),
+        (
+            action: "hit",
+            part: "hurt",
+            instrument: "clarinet",
+        ),
+        (
+            action: "clear",
+            part: "clear",
+            instrument: "clarinet",
+        ),
+        (
+            action: "menu",
+            part: "jam",
+            instrument: "clarinet",
+        ),
+    ],
+    provenance: Some((
+        author: "Camille Saint-Saëns, 1874; sequenced by the Opus executor for Be Insiculous, 2026",
+        license: "CC0-1.0",
+    )),
+    midi_fingerprint: Some(621352913397937641),
+)

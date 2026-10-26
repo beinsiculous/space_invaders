@@ -7,6 +7,7 @@ use engine_core::prelude::*;
 use crate::art::*;
 use crate::constants::*;
 use crate::spawning::{face, spawn_effect, spawn_shot, Effect, ShotRecipe};
+use crate::music::Moment;
 use crate::types::*;
 
 use super::combat::player_fire_caps;
@@ -171,6 +172,7 @@ impl SpaceInvadersGame {
         }
         self.players[index].fire_cooldown = FIRE_COOLDOWN;
         set_clip_state(ctx.world, entity, FIRE);
+        self.music.play(ctx, Moment::Shot(entity));
     }
 
     /// Spawn one of cannon `index`'s shots with its tail at `muzzle`.
@@ -218,6 +220,7 @@ impl SpaceInvadersGame {
             clip: HURT, position, facing,
         }, last_life);
         self.transient_visuals.push(hurt);
+        self.music.play(ctx, Moment::Hit);
 
         if last_life {
             if let Some(entity) = self.players[index].entity.take() {

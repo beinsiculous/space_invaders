@@ -15,7 +15,7 @@ pub(crate) use bunkers::{lose_block, Chip};
 #[cfg(test)]
 pub(crate) use combat::{invader_fire_rate, passes_through_hole, pick_shooter_column, player_fire_caps};
 #[cfg(test)]
-pub(crate) use flyers::{flyer_entry, flyer_kind_for, flyer_offscreen, saucer_bonus};
+pub(crate) use flyers::{flyer_entry, flyer_kind_for, flyer_offscreen, flyer_spawn_rolls, saucer_bonus};
 #[cfg(test)]
 pub(crate) use formation::{fleet_has_landed, march_speed, march_step, MarchOutcome};
 #[cfg(test)]
@@ -62,10 +62,16 @@ impl SpaceInvadersGame {
                 PauseAction::ExitGame => { ctx.request_exit(); return; }
                 // Skip the rest of the frame so the resuming keypress can't leak into
                 // gameplay; the world unfreezes next frame.
-                PauseAction::Resumed => return,
+                PauseAction::Resumed => {
+                    self.music.follow_pause(ctx, false);
+                    return;
+                }
                 PauseAction::Idle => {}
             }
+            self.music.follow_pause(ctx, self.pause.is_active());
             if self.pause.is_active() {
+                // A dip frozen under the menu would thaw out of step with the song.
+                self.music.rest_bob(ctx.world, &self.invaders);
                 // The engine holds the world still; only the collider overlay is ours to draw.
                 self.emit_collider_overlay(ctx);
                 return;
@@ -97,6 +103,11 @@ impl SpaceInvadersGame {
             self.cull_stray_shots(ctx);
             self.check_invasion(ctx);
             self.check_win_condition(ctx);
+        }
+        // A frame that ended the match has put the fleet at rest behind the panel; a dip
+        // written after it would be drawn there with no beat under it.
+        if self.state == GameState::Playing {
+            self.music.bob(ctx, &self.invaders);
         }
 
         self.emit_collider_overlay(ctx);

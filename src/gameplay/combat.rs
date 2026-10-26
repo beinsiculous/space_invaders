@@ -6,6 +6,7 @@ use engine_core::prelude::*;
 use crate::art::*;
 use crate::constants::*;
 use crate::spawning::{spawn_effect, spawn_shot, Effect, ShotRecipe};
+use crate::music::Moment;
 use crate::types::*;
 
 use super::bunkers::Chip;
@@ -160,6 +161,7 @@ impl SpaceInvadersGame {
         if self.invaders[target].hits_left > 1 {
             self.invaders[target].hits_left -= 1;
             set_clip_state(ctx.world, self.invaders[target].entity, HURT);
+            self.music.play(ctx, Moment::Singe(self.invaders[target].entity));
             if let Some(position) = entity_position(ctx.world, shot) {
                 self.spawn_ice_burst(ctx.world, position);
             }
@@ -179,6 +181,7 @@ impl SpaceInvadersGame {
             self.transient_visuals.push(burst);
         }
         self.physics.destroy_entity(ctx.world, invader.entity);
+        self.music.play(ctx, Moment::Bust(invader.kind));
         ShotOutcome::Kill
     }
 
@@ -300,6 +303,7 @@ impl SpaceInvadersGame {
     /// Victory the moment the last Toasted is busted.
     pub(crate) fn check_win_condition(&mut self, ctx: &mut GameContext) {
         if self.state == GameState::Playing && self.invaders.is_empty() {
+            self.music.play(ctx, Moment::Clear);
             self.unlock_win_achievements(ctx);
             self.finish_game(ctx, true);
         }
