@@ -89,18 +89,20 @@ jam's latch, the beat and the telemetry. Its tests are `src/music_tests.rs`.
 
 - **The song** is `assets/ai/music/ai_toast_busters.mid` and its sidecar: thirty-two bars of 3/4 in
   G minor at 144 BPM, 40 s, looping on a phrase's downbeat. An agent sequenced it from memory
-  through the composer's command API (`song new`, `song edit …`, `song save
-  ai/music/ai_toast_busters.mid`), so it sits under `ai/music` with the `ai_` prefix until a
-  person's pass promotes it; the composer's Save wrote the sidecar and the stanza in
-  `assets/ai/music/LICENSE`. Never hand-edit the sidecar — open the song in the composer (`cargo
-  run --features editor`, File → Open Song) and save it again. The meter is written, not assumed:
-  a song without one is 4/4, and the bob's bars would drift across the waltz's downbeats. The loop
-  ends where its last written note ends, so the waltz bass's last note is held to the bar line.
+  through the editor's command API while the editor still composed (`song new`, `song edit …`,
+  `song save ai/music/ai_toast_busters.mid`); those score verbs are gone, the score is MIDI Evil's
+  now and the engine's `song` verbs map it. It sits under `ai/music` with the `ai_` prefix until a
+  person's pass promotes it; the Conductor panel's Save wrote the sidecar and the stanza in
+  `assets/ai/music/LICENSE`. Never hand-edit the sidecar — open the song in the Conductor panel
+  (`cargo run --features editor`, File → Open Song...) and save it again. The meter is written,
+  not assumed: a song without one is 4/4, and the bob's bars would drift across the waltz's
+  downbeats. The loop ends where its last written note ends, so the waltz bass's last note is held
+  to the bar line.
 - **The background** — the clarinet's waltz tune (the solo violin's, on track `tune`) over the
   acoustic bass's oom-pah-pah (`waltz_bass`) — plays by itself from `init` on, through the menus,
-  under the pause menu and under the game-over panel. `song new` makes a track `melody` on channel 1
-  with program 0, and the composer changes no track's program; the bank has no preset 0, so a note
-  there would sound on its lowest preset, the xylophone. That track stays empty.
+  under the pause menu and under the game-over panel. `song new`, a score verb since gone, made a
+  track `melody` on channel 1 with program 0, and no edit changed its program; the bank has no
+  preset 0, so a note there would sound on its lowest preset, the xylophone. That track stays empty.
 - **Eleven bindings, four source kinds**, every part `quantize: Off` (a quantized trigger in the
   loop's last beat would be parked on the seam and dropped):
 
@@ -134,7 +136,7 @@ jam's latch, the beat and the telemetry. Its tests are `src/music_tests.rs`.
   `Music.triggered`, built only in tests, records the frame's calls.
 - **A match start decides by the song in the slot** (`GameMusic::restart`, from `start_game`, which
   every match start takes): none → requested again; the game's own → back to its top; another song
-  (the composer's audition in the editor) → left alone.
+  (the Conductor panel's audition in the editor) → left alone.
 - **The bob** — there is no grid here, the countertop's grout is the grid: on each bar line every
   live slice's art dips `BEAT_BOB_BAR_PIXELS` (4) below its spec's offset, on any other beat
   `BEAT_BOB_BEAT_PIXELS` (2; zero is bars only), and comes back up over `BEAT_BOB_SECONDS` (0.12 s).
