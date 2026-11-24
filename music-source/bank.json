@@ -1,0 +1,563 @@
+{
+  "version": 1,
+  "name": "Midnight Toast",
+  "copyright": "Original AI synthesis; Be Insiculous; CC0-1.0",
+  "presets": [
+    {
+      "name": "disco_bass",
+      "bank": 0,
+      "program": 0,
+      "zones": [
+        {
+          "wav": "rendered/disco_bass_36.wav",
+          "keys": [
+            36,
+            36
+          ],
+          "root": 36,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/disco_bass_43.wav",
+          "keys": [
+            43,
+            43
+          ],
+          "root": 43,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/disco_bass_46.wav",
+          "keys": [
+            46,
+            46
+          ],
+          "root": 46,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/disco_bass_48.wav",
+          "keys": [
+            48,
+            48
+          ],
+          "root": 48,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "spectral_lead",
+      "bank": 0,
+      "program": 1,
+      "zones": [
+        {
+          "wav": "rendered/spectral_lead_67.wav",
+          "keys": [
+            67,
+            67
+          ],
+          "root": 67,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_70.wav",
+          "keys": [
+            70,
+            70
+          ],
+          "root": 70,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_72.wav",
+          "keys": [
+            72,
+            72
+          ],
+          "root": 72,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_75.wav",
+          "keys": [
+            75,
+            75
+          ],
+          "root": 75,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_79.wav",
+          "keys": [
+            79,
+            79
+          ],
+          "root": 79,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_82.wav",
+          "keys": [
+            82,
+            82
+          ],
+          "root": 82,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_84.wav",
+          "keys": [
+            84,
+            84
+          ],
+          "root": 84,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_lead_87.wav",
+          "keys": [
+            87,
+            87
+          ],
+          "root": 87,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "chord_answer",
+      "bank": 0,
+      "program": 2,
+      "zones": [
+        {
+          "wav": "rendered/chord_answer_60.wav",
+          "keys": [
+            60,
+            60
+          ],
+          "root": 60,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/chord_answer_63.wav",
+          "keys": [
+            63,
+            63
+          ],
+          "root": 63,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/chord_answer_67.wav",
+          "keys": [
+            67,
+            67
+          ],
+          "root": 67,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/chord_answer_70.wav",
+          "keys": [
+            70,
+            70
+          ],
+          "root": 70,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "Midnight drums",
+      "bank": 128,
+      "program": 0,
+      "zones": [
+        {
+          "wav": "rendered/midnight_kick_36.wav",
+          "keys": [
+            36,
+            36
+          ],
+          "root": 36,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/midnight_snare_38.wav",
+          "keys": [
+            38,
+            38
+          ],
+          "root": 38,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/disco_hat_42.wav",
+          "keys": [
+            42,
+            42
+          ],
+          "root": 42,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "glass_bones",
+      "bank": 0,
+      "program": 13,
+      "zones": [
+        {
+          "wav": "rendered/glass_bones_72.wav",
+          "keys": [
+            72,
+            72
+          ],
+          "root": 72,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/glass_bones_75.wav",
+          "keys": [
+            75,
+            75
+          ],
+          "root": 75,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/glass_bones_79.wav",
+          "keys": [
+            79,
+            79
+          ],
+          "root": 79,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/glass_bones_82.wav",
+          "keys": [
+            82,
+            82
+          ],
+          "root": 82,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "spectral_reed",
+      "bank": 0,
+      "program": 71,
+      "zones": [
+        {
+          "wav": "rendered/spectral_reed_36.wav",
+          "keys": [
+            36,
+            36
+          ],
+          "root": 36,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_43.wav",
+          "keys": [
+            43,
+            43
+          ],
+          "root": 43,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_70.wav",
+          "keys": [
+            70,
+            70
+          ],
+          "root": 70,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_72.wav",
+          "keys": [
+            72,
+            72
+          ],
+          "root": 72,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_75.wav",
+          "keys": [
+            75,
+            75
+          ],
+          "root": 75,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_79.wav",
+          "keys": [
+            79,
+            79
+          ],
+          "root": 79,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_82.wav",
+          "keys": [
+            82,
+            82
+          ],
+          "root": 82,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_84.wav",
+          "keys": [
+            84,
+            84
+          ],
+          "root": 84,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_87.wav",
+          "keys": [
+            87,
+            87
+          ],
+          "root": 87,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_91.wav",
+          "keys": [
+            91,
+            91
+          ],
+          "root": 91,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/spectral_reed_94.wav",
+          "keys": [
+            94,
+            94
+          ],
+          "root": 94,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "halo_bells",
+      "bank": 0,
+      "program": 14,
+      "zones": [
+        {
+          "wav": "rendered/halo_bells_48.wav",
+          "keys": [
+            48,
+            48
+          ],
+          "root": 48,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_72.wav",
+          "keys": [
+            72,
+            72
+          ],
+          "root": 72,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_75.wav",
+          "keys": [
+            75,
+            75
+          ],
+          "root": 75,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_79.wav",
+          "keys": [
+            79,
+            79
+          ],
+          "root": 79,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_82.wav",
+          "keys": [
+            82,
+            82
+          ],
+          "root": 82,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_84.wav",
+          "keys": [
+            84,
+            84
+          ],
+          "root": 84,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_87.wav",
+          "keys": [
+            87,
+            87
+          ],
+          "root": 87,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/halo_bells_91.wav",
+          "keys": [
+            91,
+            91
+          ],
+          "root": 91,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    },
+    {
+      "name": "toast_thud",
+      "bank": 0,
+      "program": 32,
+      "zones": [
+        {
+          "wav": "rendered/toast_thud_48.wav",
+          "keys": [
+            48,
+            48
+          ],
+          "root": 48,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_51.wav",
+          "keys": [
+            51,
+            51
+          ],
+          "root": 51,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_55.wav",
+          "keys": [
+            55,
+            55
+          ],
+          "root": 55,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_58.wav",
+          "keys": [
+            58,
+            58
+          ],
+          "root": 58,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_72.wav",
+          "keys": [
+            72,
+            72
+          ],
+          "root": 72,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_75.wav",
+          "keys": [
+            75,
+            75
+          ],
+          "root": 75,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_79.wav",
+          "keys": [
+            79,
+            79
+          ],
+          "root": 79,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        },
+        {
+          "wav": "rendered/toast_thud_82.wav",
+          "keys": [
+            82,
+            82
+          ],
+          "root": 82,
+          "release_seconds": 0.05,
+          "longest_note_seconds": 0.42
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 (
     version: 1,
-    soundfont: "soundfonts/toast_busters.sf2",
+    soundfont: "soundfonts/ai_toast_busters.sf2",
     looping: true,
     parts: [
         (
@@ -50,7 +50,7 @@
         (
             name: "xylophone",
             source: SoundFont(
-                path: "soundfonts/toast_busters.sf2",
+                path: "soundfonts/ai_toast_busters.sf2",
                 bank: 0,
                 preset: 13,
             ),
@@ -58,7 +58,7 @@
         (
             name: "clarinet",
             source: SoundFont(
-                path: "soundfonts/toast_busters.sf2",
+                path: "soundfonts/ai_toast_busters.sf2",
                 bank: 0,
                 preset: 71,
             ),
@@ -66,7 +66,7 @@
         (
             name: "bells",
             source: SoundFont(
-                path: "soundfonts/toast_busters.sf2",
+                path: "soundfonts/ai_toast_busters.sf2",
                 bank: 0,
                 preset: 14,
             ),
@@ -74,7 +74,7 @@
         (
             name: "bass",
             source: SoundFont(
-                path: "soundfonts/toast_busters.sf2",
+                path: "soundfonts/ai_toast_busters.sf2",
                 bank: 0,
                 preset: 32,
             ),
@@ -138,8 +138,8 @@
         ),
     ],
     provenance: Some((
-        author: "Camille Saint-Saëns, 1874; sequenced by the Opus executor for Be Insiculous, 2026",
+        author: "Original AI composition and MIDI Evil synthesis for Be Insiculous, 2026",
         license: "CC0-1.0",
     )),
-    midi_fingerprint: Some(621352913397937641),
+    midi_fingerprint: Some(9377861695397163073),
 )

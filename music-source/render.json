@@ -1,0 +1,320 @@
+{
+  "seed": 11700,
+  "sample_rate": 32000,
+  "velocity": 127,
+  "gain": 0.8,
+  "backing_pitch_classes": [
+    0,
+    3,
+    7,
+    10
+  ],
+  "cue_pitch_classes": [
+    0,
+    3,
+    7,
+    10
+  ],
+  "renders": [
+    {
+      "instrument": 0,
+      "key": 36,
+      "ticks": 720,
+      "wav": "rendered/disco_bass_36.wav"
+    },
+    {
+      "instrument": 0,
+      "key": 43,
+      "ticks": 720,
+      "wav": "rendered/disco_bass_43.wav"
+    },
+    {
+      "instrument": 0,
+      "key": 46,
+      "ticks": 720,
+      "wav": "rendered/disco_bass_46.wav"
+    },
+    {
+      "instrument": 0,
+      "key": 48,
+      "ticks": 720,
+      "wav": "rendered/disco_bass_48.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 67,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_67.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 70,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_70.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 72,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_72.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 75,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_75.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 79,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_79.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 82,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_82.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 84,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_84.wav"
+    },
+    {
+      "instrument": 1,
+      "key": 87,
+      "ticks": 720,
+      "wav": "rendered/spectral_lead_87.wav"
+    },
+    {
+      "instrument": 2,
+      "key": 60,
+      "ticks": 720,
+      "wav": "rendered/chord_answer_60.wav"
+    },
+    {
+      "instrument": 2,
+      "key": 63,
+      "ticks": 720,
+      "wav": "rendered/chord_answer_63.wav"
+    },
+    {
+      "instrument": 2,
+      "key": 67,
+      "ticks": 720,
+      "wav": "rendered/chord_answer_67.wav"
+    },
+    {
+      "instrument": 2,
+      "key": 70,
+      "ticks": 720,
+      "wav": "rendered/chord_answer_70.wav"
+    },
+    {
+      "instrument": 3,
+      "key": 36,
+      "ticks": 720,
+      "wav": "rendered/midnight_kick_36.wav"
+    },
+    {
+      "instrument": 4,
+      "key": 38,
+      "ticks": 720,
+      "wav": "rendered/midnight_snare_38.wav"
+    },
+    {
+      "instrument": 5,
+      "key": 42,
+      "ticks": 720,
+      "wav": "rendered/disco_hat_42.wav"
+    },
+    {
+      "instrument": 6,
+      "key": 72,
+      "ticks": 720,
+      "wav": "rendered/glass_bones_72.wav"
+    },
+    {
+      "instrument": 6,
+      "key": 75,
+      "ticks": 720,
+      "wav": "rendered/glass_bones_75.wav"
+    },
+    {
+      "instrument": 6,
+      "key": 79,
+      "ticks": 720,
+      "wav": "rendered/glass_bones_79.wav"
+    },
+    {
+      "instrument": 6,
+      "key": 82,
+      "ticks": 720,
+      "wav": "rendered/glass_bones_82.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 36,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_36.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 43,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_43.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 70,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_70.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 72,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_72.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 75,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_75.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 79,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_79.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 82,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_82.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 84,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_84.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 87,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_87.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 91,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_91.wav"
+    },
+    {
+      "instrument": 7,
+      "key": 94,
+      "ticks": 720,
+      "wav": "rendered/spectral_reed_94.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 48,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_48.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 72,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_72.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 75,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_75.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 79,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_79.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 82,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_82.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 84,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_84.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 87,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_87.wav"
+    },
+    {
+      "instrument": 8,
+      "key": 91,
+      "ticks": 720,
+      "wav": "rendered/halo_bells_91.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 48,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_48.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 51,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_51.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 55,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_55.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 58,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_58.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 72,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_72.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 75,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_75.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 79,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_79.wav"
+    },
+    {
+      "instrument": 9,
+      "key": 82,
+      "ticks": 720,
+      "wav": "rendered/toast_thud_82.wav"
+    }
+  ]
+}

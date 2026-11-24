@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cargo run                     # play the game
 cargo run --features editor   # run the game inside the engine's scene editor
 cargo build                   # compile check
-cargo test                    # run all 89 tests (see "Tests" below)
+cargo test                    # run all 90 tests (see "Tests" below)
 cargo test <test_name>        # run a single test
 cargo clippy --all-targets -- -D warnings   # must stay clean
 ```
@@ -29,7 +29,7 @@ This is a single-crate game (`insiculous_space_invaders`), shipped as **Toast Bu
 - `spawning.rs` — every entity recipe and the clip machines; `hud.rs` — the HUD band's map in board space
 - `gameplay/` — `mod.rs` (frame orchestration, the pause gate, the F1 overlay, visibility), `formation.rs` (the march, the body-edge landing, the fleet chomping bunkers), `combat.rs` (the Toasted's fire, Bagelgeist's hole, Sour-Doom's two hits, enemy shots, cancels, culling), `bunkers.rs` (`damage_bunker` and the melt), `flyers.rs` (the saucer and Jammer), `players.rs` (movement, facing, fire, jams, hits, the respawn), `flow.rs` (start, finish, title, what a restart clears)
 - `drawing.rs` — all UI; `menu.rs` — menu input; `effects.rs` — particle presets; `achievements.rs`
-- `music.rs` — Danse Macabre: the eleven bindings, the moments that trigger them, the game's counts and the fleet's bob, over the engine's `GameMusic` (§ Music below)
+- `music.rs` — Midnight Toast: the eleven bindings, the moments that trigger them, the game's counts and the fleet's bob, over the engine's `GameMusic` (§ Music below)
 
 **Formation march is an offset, not per-entity AI.** Each `Invader` keeps its fixed `(row, column)` slot; `spawning::invader_home` is where its body stands before any march (the slot's whole-pixel cell centre, minus the sheet's measured offset). The whole fleet shares one `formation_offset` + `march_dir`. Pure `march_step()` bounces the offset off `MARCH_BOUND_X` using the outermost **live** columns' cell centres (dead columns widen the march span) and reports `descended`; each bounce drops the offset by `DESCEND_STEP` (16). `march_speed()` ramps linearly from `MARCH_SPEED_BASE` to `MARCH_SPEED_MAX`. **The landing reads body edges**: the fleet lands when a live Toasted's bottom edge reaches `INVASION_Y` (−235, the top of Deion's envelope), the only landing rule — it lies above every cannon.
 
@@ -58,11 +58,11 @@ This is a single-crate game (`insiculous_space_invaders`), shipped as **Toast Bu
 
 **Visuals:** every gameplay sprite is synced art, drawn white with emissive 0. **One draw depth per sheet** (`art.rs`), nested countertop, bunkers, jam globs (behind the formation they fall through), the four Toasted, the saucer, Jammer, Deion, Cubert, the shots, the bursts and splashes, the life icons — the renderer batches a sheet whole and transparent texels write depth, so a sheet split across depths would punch holes. **No lattice draws** — the countertop's grout is the grid, and the engine's `GridBackdrop` over it read as two grids (Jesse, 2026-10-13); kills and hits keep their drawn bursts and particles. Every one-shot — crouton bursts, ice bursts, butter splashes, jam splatters, the cannons' hurts — is kept in `transient_visuals` so a restart or a quit ends it. Particle presets live in `effects.rs`. **The life icons are world sprites** in the HUD band (`ctx.ui`'s image command cannot pick a sheet's cell), with their own visibility rule: shown only in a match, each only while its index is below its player's lives. This game has **no localization** — strings are literals.
 
-**Tests (89)** are fully headless:
+**Tests (90)** are fully headless:
 - `src/gameplay_tests.rs` (29) — the march and its pacing (8 descents to the bunkers, 13 to the landing), the body-edge landing, the roster, caps and the fleet-buff split, the thin shot, the hole's columns, the cannons' spawn and ground, the bunker states and the two chip sequences, the flyby roll and lane, and physics over the exact recipes (a shot reaching a Toasted, the flyer and a block; a crumb and a glob reaching a cannon; `Lifetime` expiry)
 - `src/art_tests.rs` (8) — every measured number re-measured from the synced PNGs: every box is the union of the frames its subject plays, the fire poses never widen an envelope, the muzzles, the hole, the bunker slice table; every clip the game types is in its sidecar and every one-shot plays once; the depth ladder
 - `src/flow_tests.rs` (13) and `src/combat_tests.rs` (8) — the match through the engine's `GameHarness`: facing, muzzle and body in both facings, the twin volley, `fire` playing out, the three hurt paths, the life icons, every HUD string in its box in the real font, restart and quit leaving nothing; the hole at the fastest march both ways with both shots and a hole shot going on to strike the Sour-Doom above, a ring shot busting the bagel, Sour-Doom's absorbed hit keeping the streak, a bunker chipped from below and redrawn, a glob passing the formation and jamming a cannon, Jammer's globs, the two flyers' payouts
-- `src/music_tests.rs` (16) — the song through the harness's virtual clock: the sidecar's eleven bindings and modes, the committed meter, the loop's end and the pluck line tiling it, the song after `init`, each moment's trigger and source (a fire on the cannon's, a bust on the game's with each kind's binding, a singe on the slice's and ended by its bust, a flyer's on its own and ended by its exit off the screen, the bonus, the cannon's last life), the frame's order, the stinger's notes held and released, the pause jam, the bob (on the beat's own frame, back within its seconds, the bodies untouched, at rest on a pause, a restart and a loss), the match start's identity rule, the missing bank
+- `src/music_tests.rs` (17) — the song through the harness's virtual clock: the sidecar's eleven bindings and modes, the committed meter, the loop's end and the pluck line tiling it, the song after `init`, each moment's trigger and source (a fire on the cannon's, a bust on the game's with each kind's binding, a singe on the slice's and ended by its bust, a flyer's on its own and ended by its exit off the screen, the bonus, the cannon's last life), the frame's order, the stinger's notes held and released, the pause jam, the bob (on the beat's own frame, back within its seconds, the bodies untouched, at rest on a pause, a restart and a loss), the match start's identity rule, the missing bank
 - `src/title_screen_tests.rs` (2) — the title art and its menu
 - `src/hud.rs` (3), `src/spawning.rs` (4), `src/achievements.rs` (5), `src/constants.rs` (1 — the startup cards)
 
@@ -79,30 +79,21 @@ The fifth of the Phase G Deion re-skins (`coordination/art-revamp/plan.md` § Ba
 - **Next: Toast Busters' levels** (`space_invaders#3`) — one bread per level, the level cards, Poptergeist's pop-up and Pain Perdu, the toast shading by chaos tier, and Stay Pufft's finale; its own plan revision.
 - Style SSOT: `deion_assets/DEION_STYLE.md`. Sheet clip names (the `.sheet.ron` sidecars) are the stable API between art and code; `art.rs` spells each one once.
 
-## Music (Danse Macabre, 2026-10)
+## Music (Midnight Toast)
 
-Toast Busters plays Camille Saint-Saëns's *Danse Macabre* through the engine's conductor
-(`training.md` § Conductor Pattern in the engine). The game's part is `src/music.rs` — its
-constants, its moments, its counts and its bob — standing on the engine's `GameMusic`
-(`engine_core::game_music`), which carries the request, the match start's identity rule, the
-jam's latch, the beat and the telemetry. Its tests are `src/music_tests.rs`.
+Toast Busters plays original AI-authored C-minor synth-disco through the engine's
+`GameMusic` and conductor. The editable project, patches, recipes and complete
+build/install/audition instructions live in `music-source/README.md`.
 
-- **The song** is `assets/ai/music/ai_toast_busters.mid` and its sidecar: thirty-two bars of 3/4 in
-  G minor at 144 BPM, 40 s, looping on a phrase's downbeat. An agent sequenced it from memory
-  through the editor's command API while the editor still composed (`song new`, `song edit …`,
-  `song save ai/music/ai_toast_busters.mid`); those score verbs are gone, the score is MIDI Evil's
-  now and the engine's `song` verbs map it. It sits under `ai/music` with the `ai_` prefix until a
-  person's pass promotes it; the Conductor panel's Save wrote the sidecar and the stanza in
-  `assets/ai/music/LICENSE`. Never hand-edit the sidecar — open the song in the Conductor panel
-  (`cargo run --features editor`, File → Open Song...) and save it again. The meter is written,
-  not assumed: a song without one is 4/4, and the bob's bars would drift across the waltz's
-  downbeats. The loop ends where its last written note ends, so the waltz bass's last note is held
-  to the bar line.
-- **The background** — the clarinet's waltz tune (the solo violin's, on track `tune`) over the
-  acoustic bass's oom-pah-pah (`waltz_bass`) — plays by itself from `init` on, through the menus,
-  under the pause menu and under the game-over panel. `song new`, a score verb since gone, made a
-  track `melody` on channel 1 with program 0, and no edit changed its program; the bank has no
-  preset 0, so a note there would sound on its lowest preset, the xylophone. That track stays empty.
+- **The song** is `assets/ai/music/ai_toast_busters.mid` and its native-save sidecar:
+  32 bars, explicit 4/4, 144 BPM, 480 PPQ. Integer tempo 416667 us gives a
+  53.333376-second loop ending on the actual bass note-off at tick 61440.
+  C/Eb/G/Bb throughout supports asynchronous cues across A/B/break/reprise sections.
+  The spectral lead, staccato bass, chord answers and disco drums play from `init`,
+  through menus and game over. Background names never select action parts.
+- **AI quarantine remains**: `ai/music` and `ai_` prefixes stay until a human pass.
+  Never hand-edit the map/fingerprint: the engine's native SongDocument remapper
+  owns saving and verifies all declared presets and exact key coverage.
 - **Eleven bindings, four source kinds**, every part `quantize: Off` (a quantized trigger in the
   loop's last beat would be parked on the seam and dropped):
 
@@ -117,12 +108,12 @@ jam's latch, the beat and the telemetry. Its tests are `src/music_tests.rs`.
   | `flyer` | a flyer enters the lane (`update_flyer`) | `chime` (Loop, one low stroke) | bells | the flyer's own |
   | `bonus` | the flyer busted (`check_flyer_hit`) | `bonus` (Loop, one high chord) | bells | the game's |
   | `hit` | a cannon hit (`player_hit`) | `hurt` (Loop, one low held note) | clarinet | the game's |
-  | `clear` | the last slice busted (`check_win_condition`) | `clear` (Loop, the dance's last chord) | clarinet | the game's |
+  | `clear` | the last slice busted (`check_win_condition`) | `clear` (Loop, the final reward chord) | clarinet | the game's |
   | `menu` | a move in the pause menu | `jam` (Loop, the counter-line) | clarinet | the menu's |
 
-  The four kinds walk **one** tune on four instruments, and a Sour-Doom's singe and bust share the
+  The four kinds walk **one** short spectral motif on four original timbres, and a Sour-Doom's singe and bust share the
   bass, so the loaf has one timbre. A shot plucks the bass note written for that moment of the
-  waltz, always in the chord; the pluck line has no rest from tick 0 to the loop's end, which a test
+  disco, always in the palette; the pluck line has no rest from tick 0 to the loop's end, which a test
   holds. **No binding for a Toasted's crumb**: no player act is behind it, forty slices firing at
   random would be a storm of triggers with no tune in it, and a crumb that lands is the `hit`. Bunker
   chips, shot cancels, Jammer's glob and the fleet's descent have none either.
@@ -155,16 +146,20 @@ jam's latch, the beat and the telemetry. Its tests are `src/music_tests.rs`.
   `singes`, `flyers`, `bonuses`, `hits`, `clears`, `jam_units`, `pulsed` and `refused`, at `info`
   when asked — `?telemetry=1` on the web page, `TOAST_BUSTERS_TELEMETRY=1` natively. `init` ends
   with `toast busters: init complete`, the line the boot measurement stops on.
-- **The bank** is `assets/soundfonts/toast_busters.sf2`, FluidR3 GM's xylophone (0:13), clarinet
-  (0:71), tubular bells (0:14) and acoustic bass (0:32), 3.43 MiB, cut by
-  `scripts/prepare_soundfont.sh` — a wrapper over the engine's `scripts/prepare_game_soundfont.sh`
-  with `--bank <path>` for a FluidR3_GM.sf2 got any other way; the source's and the output's
-  sha256s are in the `LICENSE` beside it. No violin fits: FluidR3's is 3 MiB alone, and any string
-  preset beside the xylophone is over the cap. Budget: **the bank under 4 MiB** (the engine's script
-  refuses to write one over it), the song under 256 KiB. On the web every asset, the bank
-  included, is fetched before the first frame.
-- The browser bundles moved to **v7** (game) and **v6** (editor) with the music
-  (`src/web_entry.rs` names the four places each version lives).
+- **The bank** is `assets/soundfonts/ai_toast_busters.sf2`: original CC0 MIDI Evil
+  synthesis, finite exact-key zones, no third-party samples. Four legacy slots
+  xylophone 13 / clarinet 71 / bells 14 / bass 32 now voice glass tones, filtered
+  spectral reed, halo bells and dry toast thuds. The shared `bones` contract keeps
+  singe and Sour-Doom bust alike in timbre; their source lifetime remains distinct.
+  Shots use lower velocity than hits; bright bonus/clear chords answer the lead.
+  `scripts/prepare_soundfont.sh` delegates to the shared engine builder via the
+  game's thin `music-source/build.py`. Bank budget 4 MiB, MIDI 256 KiB, one layer
+  per key and four triggered slots. All runtime assets preload on the web.
+  Historical editor songs need their original bank and license restored separately
+  from pre-migration revision a29cb45, never retargeted to the new bank.
+- Local browser auditions retain **v7** (game) and **v6** (editor); no publication
+  or immutable deployed version overwrite. Publication requires new versions in
+  all four places named by each checklist in `src/web_entry.rs`.
 
 ## Work tracking
 

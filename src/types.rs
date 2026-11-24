@@ -322,7 +322,7 @@ pub struct SpaceInvadersGame {
     /// F1 toggles magenta collider outlines over the sprites.
     pub(crate) debug_colliders: bool,
 
-    /// Danse Macabre: the song, its moments' counts and the fleet's bob.
+    /// Midnight Toast: the song, its moments' counts and the fleet's bob.
     pub(crate) music: crate::music::Music,
 }
 

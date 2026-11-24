@@ -1,7 +1,7 @@
-//! Toast Busters' music: Camille Saint-Saëns's *Danse Macabre*, which the engine's conductor
+//! Toast Busters' music: the original *Midnight Toast*, which the engine's conductor
 //! plays as a song.
 //!
-//! The background — the clarinet's waltz tune over the acoustic bass's oom-pah-pah — plays by
+//! The background — a spectral hook over staccato disco bass and drums — plays by
 //! itself from `init` on, through the menus and under the pause menu. Ten moments trigger the
 //! song's bindings, each on the source [`Music::play`] names for it; a move in the pause menu
 //! jams the `jam` counter-line; the fleet bobs on the song's bars and beats, in its art only.
