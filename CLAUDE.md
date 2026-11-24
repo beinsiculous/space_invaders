@@ -157,9 +157,11 @@ build/install/audition instructions live in `music-source/README.md`.
   per key and four triggered slots. All runtime assets preload on the web.
   Historical editor songs need their original bank and license restored separately
   from pre-migration revision a29cb45, never retargeted to the new bank.
-- Local browser auditions retain **v7** (game) and **v6** (editor); no publication
-  or immutable deployed version overwrite. Publication requires new versions in
-  all four places named by each checklist in `src/web_entry.rs`.
+- Website release bundles use game `/games/toast-busters/v8/` and editor
+  `/playground/invaders/v7/`. The matching site content and bundles
+  are prepared in `insiculous_web`; its dev/main merges deploy staging/production.
+  Preserve previous version directories. The four-place checklists in
+  `src/web_entry.rs` must agree for every later release.
 
 ## Work tracking
 

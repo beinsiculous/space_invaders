@@ -109,6 +109,6 @@ rejected, late, stale or silent triggers must all stay zero. The closure test al
 renders every action in a fresh Conductor with music0/sfx1 and4096 stereo frames,
 asserting finite unclipped PCM and positive energy, not merely accepted triggers.
 
-Local browser bundles use the constants verified in src/web_entry.rs:
-`toast-busters --kind games --version v7` and `invaders --kind editor --version v6`.
-No deployment or version change is part of this batch.
+Website release bundles use the constants in src/web_entry.rs:
+`toast-busters --kind games --version v8` and `invaders --kind editor --version v7`.
+Matching bundles and content are prepared in insiculous_web for its dev/main merges.
