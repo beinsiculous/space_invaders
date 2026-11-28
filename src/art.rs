@@ -55,11 +55,11 @@ pub(crate) const BAGELGEIST_HOLE_COLUMNS: (f32, f32) = (27.0, 36.0);
 
 // --- the flyers ------------------------------------------------------------------------
 
-/// Maxwell's cake saucer, its `fly` frames' union: 76 x 65.
+/// Maxwell's cake saucer, its `fly` frames' union: 75 x 59.
 pub(crate) const SAUCER: SheetSpec = SheetSpec {
     path: "sprites/ai_maxwell_cake_saucer_96x80.png",
     cell: SAUCER_CELL,
-    bounds: (Vec2::new(10.0, 7.0), Vec2::new(86.0, 72.0)),
+    bounds: (Vec2::new(10.0, 13.0), Vec2::new(85.0, 72.0)),
 };
 /// Jammer crossing the lane, its `march` frames' union: 36 x 46.
 pub(crate) const JAMMER: SheetSpec = SheetSpec {
@@ -77,11 +77,11 @@ pub(crate) const DEION: SheetSpec = SheetSpec {
     cell: HERO_CELL,
     bounds: (Vec2::new(9.0, 1.0), Vec2::new(55.0, 56.0)),
 };
-/// Cubert's collision envelope, the same union: 28 x 43.
+/// Cubert's collision envelope, the same union: 34 x 49.
 pub(crate) const CUBERT: SheetSpec = SheetSpec {
     path: "sprites/ai_cubert.png",
     cell: HERO_CELL,
-    bounds: (Vec2::new(18.0, 14.0), Vec2::new(46.0, 57.0)),
+    bounds: (Vec2::new(16.0, 8.0), Vec2::new(50.0, 57.0)),
 };
 
 // --- the shots, each its `fly` frames' union ------------------------------------------
@@ -293,7 +293,7 @@ pub(crate) struct HeroSpec {
 
 const DEION_SPEC: HeroSpec = HeroSpec {
     sheet: &DEION, depth: DEION_DEPTH, shot: &ICICLE, shot_depth: ICICLE_DEPTH,
-    muzzle_in_cell: Vec2::new(38.5, 4.0), life_icon_clip: LIFE_ICON_DEION, name: "Deion",
+    muzzle_in_cell: Vec2::new(38.5, 1.0), life_icon_clip: LIFE_ICON_DEION, name: "Deion",
 };
 const CUBERT_SPEC: HeroSpec = HeroSpec {
     sheet: &CUBERT, depth: CUBERT_DEPTH, shot: &ICE_CHIP, shot_depth: ICE_CHIP_DEPTH,

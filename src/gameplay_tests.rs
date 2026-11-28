@@ -76,9 +76,9 @@ fn the_landing_reads_body_edges_against_the_top_of_deions_envelope() {
     assert!(!fleet_has_landed(&[INVASION_Y + 0.5, 100.0]));
     assert!(!fleet_has_landed(&[]), "an empty fleet never lands");
     // The line lies above every cannon, so no separate cannon-contact rule is needed:
-    // Cubert alone is landed on 12 px above his head.
+    // Cubert alone is landed on 6 px above his head.
     let cubert_top = GROUND_Y + 2.0 * Hero::Cubert.half_envelope().y;
-    assert_eq!(INVASION_Y - cubert_top, 12.0);
+    assert_eq!(INVASION_Y - cubert_top, 6.0);
 }
 
 // --- the roster ---

@@ -136,14 +136,12 @@ fn a_cannons_fire_poses_never_widen_its_envelope() {
 }
 
 #[test]
-fn each_muzzle_is_the_crests_top_row_in_every_fire_frame_and_the_first_idle_frame() {
+fn each_muzzle_is_the_crests_top_row_in_every_fire_frame() {
     for hero in [Hero::Deion, Hero::Cubert] {
         let spec = hero.spec();
         let image = pixels(spec.sheet);
-        // A shot leaves while `fire` plays; the idle bobs, so only its first frame agrees.
-        let mut checked = frames(spec.sheet, &[FIRE]);
-        checked.push(frames(spec.sheet, &[IDLE])[0]);
-        for frame in checked {
+        // A shot leaves while `fire` plays; `idle` bobs and sways independently.
+        for frame in frames(spec.sheet, &[FIRE]) {
             let (top_left, _) = frame_box(&image, spec.sheet, frame).expect("the frame draws");
             assert_eq!(top_left.y, spec.muzzle_in_cell.y, "{hero:?} frame {frame}'s top row");
             let columns = image.width() / spec.sheet.cell.x as u32;
